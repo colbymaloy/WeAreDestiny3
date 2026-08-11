@@ -1,0 +1,80 @@
+WE ARE DESTINY 3 — Licensing
+============================
+
+This repository holds two different kinds of thing, and they are licensed
+differently.
+
+--------------------------------------------------------------------------
+1. THE SITE AND TOOLING — MIT License
+--------------------------------------------------------------------------
+
+Applies to the source of the website and the project's tooling: everything
+under src/ and .github/.
+
+Copyright (c) 2026 WE ARE DESTINY 3 contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+--------------------------------------------------------------------------
+2. CONCEPT WORK — retained by its creator
+--------------------------------------------------------------------------
+
+Applies to every concept submitted to the project: images, video, audio,
+3D work, the contents of concepts/, and anything else contributed as part
+of a concept.
+
+Creators keep full ownership of their own work. Submitting a concept grants
+this project a non-exclusive, worldwide, royalty-free licence to display,
+reproduce and distribute that work as part of the WE ARE DESTINY 3 website,
+repository, and non-commercial promotion of the project, with attribution to
+the creator. Nothing else is granted or implied, and a creator may ask for
+their work to be removed at any time by opening an issue.
+
+Unless a creator states otherwise on their own entry, concept work in this
+repository is offered to the public under:
+
+    Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+    (CC BY-NC-SA 4.0)
+    https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+In short: reuse and remix it, credit the creator, share it under the same
+terms, and don't sell it.
+
+A creator may license their own entry more permissively by saying so in the
+entry's description or in an accompanying file. Their statement wins for
+their work.
+
+--------------------------------------------------------------------------
+3. FAN PROJECT NOTICE
+--------------------------------------------------------------------------
+
+WE ARE DESTINY 3 is an unofficial, non-commercial community fan project. It
+is not affiliated with, endorsed by, sponsored by, or associated with Bungie,
+Inc.
+
+"Destiny", "Destiny 2", and related names, characters, logos, imagery and
+trademarks are the property of their respective owners. No claim of ownership
+over them is made here, and none of the licences above extend to them.
+
+Concepts published here are speculative work created by individual community
+members. They are not Bungie material, not leaked material, and not a
+prediction of any real product.
+
+Rights holders with a concern about any material in this repository can open
+an issue or contact the maintainer, and it will be addressed promptly.

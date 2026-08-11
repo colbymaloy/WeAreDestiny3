@@ -1,0 +1,86 @@
+{
+  "$comment": "Reference example. Folders starting with _ are skipped by the build. Copy this into concepts/<your-slug>/concept.json and edit.",
+
+  "slug": "_example",
+  "title": "Super Activation Redesign",
+  "creator": "colbymaloy",
+  "categories": ["gameplay", "ui"],
+  "status": "exploring",
+  "date": "2026-08-11",
+
+  "summary": "Reimagining Super activation as a transition into a temporary altered combat state rather than simply triggering an ability. The HUD contracts, the weapon dissolves into energy, and the environment reacts to the Guardian rather than the other way around.",
+
+  "cover": "exploration-03",
+
+  "takeaways": [
+    "The HUD physically reorganizes around the Super instead of swapping an icon",
+    "The weapon transitions into energy rather than disappearing",
+    "World lighting responds to activation",
+    "A Super should feel like entering another state, not pressing another button"
+  ],
+
+  "tools": ["Veo", "After Effects", "Figma"],
+  "discussion": "https://github.com/colbymaloy/WeAreDestiny3/issues/12",
+
+  "directions": [
+    {
+      "id": "energy-manifestation",
+      "title": "Direction A — Energy Manifestation",
+      "note": "The Light arrives from outside the Guardian and collects around them."
+    },
+    {
+      "id": "weapon-overcharge",
+      "title": "Direction B — Weapon Overcharge",
+      "note": "The Super grows out of the equipped weapon instead of replacing it."
+    }
+  ],
+
+  "moments": [
+    { "label": "HUD collapse", "from": "exploration-01", "t": [2, 4] },
+    { "label": "Weapon dissolve", "from": "exploration-02", "t": [1.5, 4.5] },
+    { "label": "Ground lighting response", "from": "exploration-04", "t": [0, 3] }
+  ],
+
+  "explorations": [
+    {
+      "id": "exploration-01",
+      "focus": "HUD transition",
+      "direction": "energy-manifestation",
+      "type": "video",
+      "media": "https://github.com/user-attachments/assets/00000000-0000-0000-0000-000000000000",
+      "thumbnail": "/media/thumbnails/example-01.jpg",
+      "keep": ["HUD collapse", "Initial flash"],
+      "drop": ["The Super itself"],
+      "tools": ["Veo"],
+      "process": "Prompted for a first-person ability activation with the HUD reacting before the effect fires."
+    },
+    {
+      "id": "exploration-02",
+      "focus": "Weapon transformation",
+      "direction": "energy-manifestation",
+      "type": "video",
+      "media": "https://github.com/user-attachments/assets/00000000-0000-0000-0000-000000000000",
+      "thumbnail": "/media/thumbnails/example-02.jpg",
+      "keep": ["Weapon dissolve"],
+      "drop": ["Ability HUD animation", "Pacing"]
+    },
+    {
+      "id": "exploration-03",
+      "focus": "Activation and camera",
+      "direction": "weapon-overcharge",
+      "type": "video",
+      "media": "https://github.com/user-attachments/assets/00000000-0000-0000-0000-000000000000",
+      "thumbnail": "/media/thumbnails/example-03.jpg",
+      "keep": ["Camera movement", "Environmental reaction", "Overall pacing"],
+      "drop": ["Weapon model"]
+    },
+    {
+      "id": "exploration-04",
+      "focus": "Environment response",
+      "type": "image",
+      "media": "/media/images/example-04.jpg",
+      "thumbnail": "/media/thumbnails/example-04.jpg",
+      "keep": ["Energy material", "Ground lighting"]
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!--INCLUDE:head.html
+  TITLE=Contribute — WE ARE DESTINY 3
+  OG_TITLE=Contribute to WE ARE DESTINY 3
+  DESCRIPTION=Post a concept for what Destiny 3 should be. Any medium, any tool. Fill in a form and drag your files in — no Git required.
+  PATH=/contribute/
+-->
+</head>
+
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+
+<!--INCLUDE:topbar.html-->
+
+<main class="page" id="main">
+  <div class="page-head">
+    <p class="eyebrow"><span class="mark"></span>Anyone can post</p>
+    <h1 class="page-title">Show us<br>your answer</h1>
+  </div>
+
+  <div class="prose">
+    <p><strong>You don't need to be a developer, and you don't need to have finished anything.</strong>
+       Fill in a form, drag your files in, post it. That's the whole process.</p>
+
+    <p style="margin-top:2em">
+      <a class="btn btn-primary" href="https://github.com/colbymaloy/WeAreDestiny3/issues/new?template=submit-concept.yml" rel="noopener">Submit a concept</a>
+    </p>
+
+    <h2>What makes a concept</h2>
+
+    <p>One idea is one entry. If you made five videos exploring the same combat scenario, that's a single
+       concept with five explorations inside it — not five posts. Give the idea a name, say what you're
+       proposing, and attach whatever you have.</p>
+
+    <p>The form asks for:</p>
+
+    <ul>
+      <li><strong>Title</strong> — name the idea, not the file.</li>
+      <li><strong>Category</strong> — worlds, UI, gameplay, weapons, armor, abilities, subclasses, enemies, social, misc. Pick up to three.</li>
+      <li><strong>The idea</strong> — two to four sentences on what you're proposing and why.</li>
+      <li><strong>Key takeaways</strong> — the specific claims the concept is making. Optional, but this is what makes it read as design rather than decoration.</li>
+      <li><strong>Explorations</strong> — every attempt you made, including the ones that didn't work. Say what each one was testing.</li>
+      <li><strong>What to keep, what to drop</strong> — per exploration. This is the most useful thing you can write.</li>
+      <li><strong>Tools and process</strong> — optional. Share as much or as little as you want.</li>
+    </ul>
+
+    <h2>Keep the failures</h2>
+
+    <p>Especially for AI work, no single generation is ever quite right. Don't throw away the four that
+       missed — annotate them.</p>
+
+    <pre>Exploration 01 — HUD transition
+  keep   HUD collapse, energy pulse
+  drop   the Super itself
+
+Exploration 03 — Weapon morph
+  keep   weapon dissolve
+  drop   camera shake
+
+Exploration 04 — Environment
+  keep   ground lighting response</pre>
+
+    <p>Then pull the seconds that actually worked into <strong>Selected moments</strong> — a two-second HUD
+       animation from one, a three-second weapon transformation from another, a single frame from a third.
+       Together they communicate the design even though no single attempt nailed it. That's how a real
+       concept board works.</p>
+
+    <h2>Media</h2>
+
+    <p>Drag images and video straight into the submission form. GitHub uploads and hosts them for you.</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>What</th><th>Limit</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Images and GIFs</td><td>10 MB</td></tr>
+          <tr><td>Video — MP4, MOV, WEBM</td><td>10 MB on Free plans, 100 MB on paid</td></tr>
+          <tr><td>Anything larger</td><td>Goes on a GitHub Release — up to 2 GB per file</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Video files are never committed to the repository. Say so in your submission if something is too big
+       and it'll be uploaded to a Release for you.</p>
+
+    <h2>If you use Git</h2>
+
+    <p>Add a folder. One concept per folder, so submissions never conflict with each other:</p>
+
+    <pre>concepts/your-concept-slug/
+  concept.json      the entry
+  notes.md          optional long-form writeup</pre>
+
+    <p>Then check it before you push:</p>
+
+    <pre>node .github/scripts/validate.mjs</pre>
+
+    <p>The same check runs on your pull request. Full field reference in
+       <a href="https://github.com/colbymaloy/WeAreDestiny3/blob/main/CONTRIBUTING.md" rel="noopener">CONTRIBUTING.md</a>.</p>
+
+    <h2>Not sure what to make?</h2>
+
+    <p>Answer one open brief. What should firing a weapon feel like? What replaces the ability HUD? What
+       destination couldn't have existed in Destiny 2? What should the Tower become?</p>
+
+    <p><a href="/#briefs">See the open briefs</a> — nobody has claimed them.</p>
+
+    <h2>Two things that don't belong</h2>
+
+    <p>Work you don't have the right to share, and anything presented as real or leaked Destiny 3 material.
+       This project is fiction, openly. Read the
+       <a href="https://github.com/colbymaloy/WeAreDestiny3/blob/main/CODE_OF_CONDUCT.md" rel="noopener">code of conduct</a>
+       before posting.</p>
+  </div>
+</main>
+
+<!--INCLUDE:footer.html-->
+</body>
+</html>

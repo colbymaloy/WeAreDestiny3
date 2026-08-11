@@ -1,0 +1,29 @@
+name: Validate concepts
+
+on:
+  pull_request:
+    paths:
+      - 'concepts/**'
+      - 'media/**'
+      - 'src/**'
+      - '.github/scripts/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate concept data
+        run: node .github/scripts/validate.mjs
+
+      # Catches template and rendering errors before they reach main.
+      - name: Build site
+        run: node .github/scripts/build.mjs

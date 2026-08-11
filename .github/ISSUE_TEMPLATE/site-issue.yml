@@ -1,0 +1,30 @@
+name: Site issue
+description: Something on wearedestiny3.com is broken, unreadable, or hard to use.
+title: "[Site] "
+labels: ["site"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What did you expect, and what did you get instead?
+    validations:
+      required: true
+
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: Page or concept link, if it is specific to one.
+      placeholder: https://wearedestiny3.com/concepts/super-activation-redesign/
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      placeholder: Safari on iPhone 15, Chrome on Windows
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshot or anything else

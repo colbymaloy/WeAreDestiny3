@@ -1,0 +1,150 @@
+name: Submit a concept
+description: Post an idea for what Destiny 3 should be. No Git, no cloning, no JSON.
+title: "[Concept] "
+labels: ["submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **One idea is one entry.**
+
+        If you made five videos exploring the same scenario, that is *one* concept with five
+        explorations — not five submissions. Post the idea, then attach every attempt underneath it.
+
+        Drag images and video straight into the fields below. GitHub hosts them for you: images and
+        GIFs up to 10 MB, video up to 10 MB on Free plans or 100 MB on paid, in MP4, MOV or WEBM.
+        Anything larger — say so and it will be attached to a Release instead.
+
+        Only the first four fields are required.
+
+  - type: input
+    id: title
+    attributes:
+      label: Title
+      description: Name the idea, not the file.
+      placeholder: Super Activation Redesign
+    validations:
+      required: true
+
+  - type: dropdown
+    id: categories
+    attributes:
+      label: Categories
+      description: Pick up to three.
+      multiple: true
+      options:
+        - Worlds
+        - UI
+        - Gameplay
+        - Weapons
+        - Armor
+        - Abilities
+        - Subclasses
+        - Enemies
+        - Social
+        - Misc
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: The idea
+      description: Two to four sentences. What are you proposing, and what problem or feeling is it chasing?
+      placeholder: Reimagining Super activation as a transition into a temporary altered combat state rather than simply triggering an ability. The HUD contracts, the weapon dissolves into energy, and the environment reacts to the Guardian.
+    validations:
+      required: true
+
+  - type: textarea
+    id: cover
+    attributes:
+      label: Hero media
+      description: Your strongest still or video — the closest thing to the idea as you picture it. This becomes the card on the board.
+      placeholder: Drop a file here.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: status
+    attributes:
+      label: Status
+      description: How settled the idea is — not how good it is. Exploring is the normal starting point.
+      options:
+        - Exploring — many directions, nothing settled
+        - Direction — a clear idea has emerged
+        - Refined — a polished representation exists
+      default: 0
+
+  - type: textarea
+    id: takeaways
+    attributes:
+      label: Key takeaways
+      description: The specific claims this concept is making. One per line. This is what makes it read as design rather than decoration.
+      placeholder: |
+        The HUD physically reorganizes around the Super instead of swapping an icon
+        The weapon transitions into energy rather than disappearing
+        World lighting responds to activation
+
+  - type: textarea
+    id: explorations
+    attributes:
+      label: Explorations
+      description: |
+        Every attempt, including the ones that didn't work. Say what each was testing, then what to keep
+        and what to leave behind. Drop the files in as you go. Don't rank them — 01 isn't worse than 04.
+      placeholder: |
+        01 — HUD transition
+        keep: HUD collapse, initial flash
+        drop: the Super itself
+        [drop file here]
+
+        02 — Weapon transformation
+        keep: weapon dissolve
+        drop: ability HUD animation, pacing
+        [drop file here]
+
+  - type: textarea
+    id: moments
+    attributes:
+      label: Selected moments
+      description: |
+        The seconds worth keeping. Point at an exploration and a time range — no re-exporting needed.
+        This is how imperfect generations become design research instead of clutter.
+      placeholder: |
+        HUD collapse — exploration 01, 0:02–0:04
+        Weapon dissolve — exploration 02, 0:01.5–0:04.5
+
+  - type: input
+    id: tools
+    attributes:
+      label: Tools
+      description: Optional, but encouraged. Comma separated.
+      placeholder: Veo, After Effects, Figma
+
+  - type: textarea
+    id: process
+    attributes:
+      label: Process or prompts
+      description: Optional. Share as much or as little of how you made it as you want.
+
+  - type: input
+    id: credits
+    attributes:
+      label: Building on someone else's concept?
+      description: Optional. Credit and link the original creator.
+
+  - type: input
+    id: creator
+    attributes:
+      label: Credit this to
+      description: Optional. Defaults to your GitHub username. Use this for a different name or a co-creator.
+
+  - type: checkboxes
+    id: rights
+    attributes:
+      label: Before you post
+      options:
+        - label: This is my own work, or I have the right to share it.
+          required: true
+        - label: I understand it will be displayed publicly on wearedestiny3.com with credit to me.
+          required: true

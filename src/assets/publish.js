@@ -12,7 +12,8 @@ import {
 } from '/assets/model.mjs';
 import { renderOverview } from '/assets/render.mjs';
 import { iconSprite } from '/assets/icons.mjs';
-import { createEditor } from '/assets/editor.js?v=6';
+import { createEditor } from '/assets/editor.js?v=7';
+import { createConceptPicker } from '/assets/picker.js?v=7';
 import { firebaseConfig, isConfigured } from '/assets/firebase-config.js';
 
 const el = id => document.getElementById(id);
@@ -349,7 +350,8 @@ function addConnection() {
         </div>
         <div class="field">
           <label>Concept</label>
-          <select data-concept></select>
+          <p class="hint">Search the board, or paste the link to a concept.</p>
+          <div data-picker></div>
         </div>
       </div>
       <div class="field">
@@ -375,24 +377,26 @@ function addConnection() {
     node.querySelector('[data-rel]').append(
       ...Object.entries(RELATIONS).map(([id, meta]) => option(id, meta.label)));
 
-    const concept = node.querySelector('[data-concept]');
-    concept.append(
-      option('', state.concepts.length ? 'Choose a concept' : 'No concepts on the board yet'),
-      ...state.concepts.map(c => option(c.slug, `${c.title} — @${c.creator}`)));
-
     const exploration = node.querySelector('[data-exploration]');
     const range = node.querySelector('[data-range]');
 
-    concept.addEventListener('change', () => {
-      const target = state.concepts.find(c => c.slug === concept.value);
+    /* Which explorations can be cited depends on which concept was picked,
+       so the two controls are wired together rather than filled once. */
+    const fillExplorations = target => {
       exploration.replaceChildren(option('', 'The whole concept'));
       for (const item of target?.explorations ?? []) {
         exploration.append(option(item.id, `${item.number} — ${item.focus}`));
       }
       show(range, false);
+    };
+
+    createConceptPicker(node.querySelector('[data-picker]'), {
+      concepts: () => state.concepts,
+      onPick: fillExplorations,
     });
+
     exploration.addEventListener('change', () => show(range, Boolean(exploration.value)));
-    concept.dispatchEvent(new Event('change'));
+    fillExplorations(null);
   });
 }
 

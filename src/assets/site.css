@@ -2519,3 +2519,80 @@ body.landing { padding-top: 0; }
   color: var(--bone-faint);
 }
 .ed-surface hr, .prose hr { margin: 1.6em 0; border: 0; border-top: 1px solid var(--line); }
+
+
+/* --- concept picker ------------------------------------------------------- */
+
+.picker { position: relative; }
+.picker-input {
+  width: 100%;
+  height: 43px;
+  padding: 0 14px;
+  border: 1px solid var(--line-hi);
+  border-radius: var(--r-md);
+  background: rgba(6, 10, 18, .7);
+  color: var(--bone);
+  font: inherit;
+}
+.picker-input:focus { outline: none; border-color: var(--light); }
+.picker-input:disabled { opacity: .5; cursor: not-allowed; }
+
+.picker-list {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid var(--line-hi);
+  border-radius: var(--r-lg);
+  background: var(--panel-hi);
+  box-shadow: 0 24px 48px -18px rgba(0, 0, 0, .8);
+}
+.picker-hit {
+  display: block;
+  width: 100%;
+  padding: 9px 11px;
+  border: 0;
+  border-radius: var(--r-md);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+.picker-hit:hover,
+.picker-hit[aria-selected="true"] { background: rgba(169, 99, 255, .16); }
+.picker-hit-title { display: block; font-size: .95rem; color: var(--bone); }
+.picker-hit-meta {
+  display: block;
+  margin-top: 3px;
+  font-size: .78rem;
+  line-height: 1.4;
+  color: var(--bone-faint);
+}
+.picker-none { margin: 0; padding: 10px 11px; font-size: .86rem; color: var(--bone-faint); }
+
+.picker-chosen {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-violet);
+  border-radius: var(--r-md);
+  background: rgba(24, 14, 48, .4);
+}
+.picker-chosen-body { flex: 1 1 auto; min-width: 0; }
+.picker-chosen-title { display: block; font-size: .95rem; color: var(--bone); text-decoration: underline; }
+.picker-clear {
+  flex: 0 0 auto;
+  padding: 5px 11px;
+  border: 1px solid var(--line-hi);
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--bone-dim);
+  font: inherit;
+  font-size: .8rem;
+  cursor: pointer;
+}
+.picker-clear:hover { color: var(--bone); border-color: var(--light); }

@@ -5,7 +5,7 @@
    adds behaviour on top of a page that already works without it.
    ============================================================= */
 
-import { pressGroup, showMatching } from '/assets/filters.js?v=6';
+import { pressGroup, showMatching } from '/assets/filters.js?v=7';
 
 /* Category filters */
 const filters = document.getElementById('filters');

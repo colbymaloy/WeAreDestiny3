@@ -240,7 +240,7 @@
   position: absolute;
   inset: 0;
   z-index: -2;
-  background: url("/media/hero/frontier.jpg?v=6") no-repeat 50% 50% / cover;
+  background: url("/media/hero/frontier.jpg?v=7") no-repeat 50% 50% / cover;
   opacity: .6;
   mix-blend-mode: screen;
   transition: transform 2s var(--l-ease);
@@ -761,7 +761,7 @@
   opacity: .12;
   mix-blend-mode: screen;
   pointer-events: none;
-  background: url("/media/concepts/c5.jpg?v=6") no-repeat 50% 50% / cover;
+  background: url("/media/concepts/c5.jpg?v=7") no-repeat 50% 50% / cover;
 }
 .home .cta-copy {
   position: relative;
@@ -780,7 +780,7 @@
   border: 1px solid rgba(255,255,255,.2);
   border-radius: 12px;
   box-shadow: 0 25px 50px -12px rgba(0,0,0,.5);
-  background: url("/media/concepts/c4.jpg?v=6") no-repeat 50% 45% / cover;
+  background: url("/media/concepts/c4.jpg?v=7") no-repeat 50% 45% / cover;
 }
 .home .cta-title { margin-bottom: 8px; font-size: 24px; color: #FFFFFF; }
 .home .cta-desc { max-width: 576px; font-size: 16px; color: var(--l-muted); }

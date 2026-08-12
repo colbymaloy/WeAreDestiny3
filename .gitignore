@@ -1,2 +1,10 @@
 _site/
 .DS_Store
+node_modules/
+functions/model.mjs
+functions/.secret.local
+functions/graph.mjs
+functions/render.mjs
+functions/templates/
+functions/index-shell.html
+functions/home-data.json

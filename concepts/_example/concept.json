@@ -1,26 +1,83 @@
 {
-  "$comment": "Reference example. Folders starting with _ are skipped by the build. Copy this into concepts/<your-slug>/concept.json and edit.",
+  "$comment": "Reference example. Folders starting with _ are skipped by the build. Copy this into concepts/<your-slug>/concept.json and edit. Every field except slug/title/creator/type/categories/status/summary is optional.",
 
   "slug": "_example",
-  "title": "Super Activation Redesign",
-  "creator": "colbymaloy",
-  "categories": ["gameplay", "ui"],
-  "status": "exploring",
+  "title": "Supers as Combat States",
+  "creator": "guardian42",
+  "type": "design",
+  "categories": ["gameplay", "abilities"],
+  "status": "direction",
   "date": "2026-08-11",
+  "featured": false,
 
-  "summary": "Reimagining Super activation as a transition into a temporary altered combat state rather than simply triggering an ability. The HUD contracts, the weapon dissolves into energy, and the environment reacts to the Guardian rather than the other way around.",
+  "summary": "Activating a Super should feel like entering another form rather than firing a single oversized ability. Your entire kit transforms for twenty to thirty seconds.",
 
-  "cover": "exploration-03",
+  "question": "what-should-supers-become",
 
-  "takeaways": [
-    "The HUD physically reorganizes around the Super instead of swapping an icon",
-    "The weapon transitions into energy rather than disappearing",
-    "World lighting responds to activation",
-    "A Super should feel like entering another state, not pressing another button"
+  "body": [
+    {
+      "type": "prose",
+      "heading": "The idea",
+      "text": "Instead of pressing a button for one large attack, activating your Super temporarily transforms your entire ability kit.\n\nThe Super is not the attack. The Super is the state you enter, and everything you already know how to do changes inside it."
+    },
+    {
+      "type": "flow",
+      "heading": "The proposal",
+      "steps": [
+        "Normal state",
+        "Super activation",
+        "Weapon and abilities transform",
+        "20–30 second altered combat state",
+        "Finisher opportunity"
+      ]
+    },
+    {
+      "type": "list",
+      "heading": "Why",
+      "items": [
+        "Creates more player expression",
+        "Allows buildcrafting within Supers",
+        "Makes activation mechanically meaningful",
+        "Opens space for cooperative Super interactions"
+      ]
+    },
+    {
+      "type": "quote",
+      "text": "A Super should change what you can do, not just what you press."
+    }
   ],
 
-  "tools": ["Veo", "After Effects", "Figma"],
-  "discussion": "https://github.com/colbymaloy/WeAreDestiny3/issues/12",
+  "takeaways": [
+    "The HUD reorganizes around the state, not the icon",
+    "Buildcrafting continues inside the Super",
+    "Duration replaces burst as the design lever"
+  ],
+
+  "connections": [
+    {
+      "rel": "builds-on",
+      "concept": "super-activation-exploration",
+      "note": "The weapon transformation and HUD transition in this exploration are close to how I imagine entering the state."
+    },
+    {
+      "rel": "references",
+      "concept": "super-activation-exploration",
+      "exploration": "exploration-03",
+      "t": [4, 8],
+      "note": "Reference — Super entry transition"
+    },
+    {
+      "rel": "pairs-with",
+      "concept": "radial-ability-hud"
+    },
+    {
+      "rel": "alternative-to",
+      "concept": "one-shot-supers",
+      "note": "Same problem, opposite answer — that one makes Supers rarer and bigger instead."
+    }
+  ],
+
+  "cover": "exploration-03",
 
   "directions": [
     {
@@ -37,8 +94,7 @@
 
   "moments": [
     { "label": "HUD collapse", "from": "exploration-01", "t": [2, 4] },
-    { "label": "Weapon dissolve", "from": "exploration-02", "t": [1.5, 4.5] },
-    { "label": "Ground lighting response", "from": "exploration-04", "t": [0, 3] }
+    { "label": "Weapon dissolve", "from": "exploration-02", "t": [1.5, 4.5] }
   ],
 
   "explorations": [
@@ -52,7 +108,7 @@
       "keep": ["HUD collapse", "Initial flash"],
       "drop": ["The Super itself"],
       "tools": ["Veo"],
-      "process": "Prompted for a first-person ability activation with the HUD reacting before the effect fires."
+      "process": "Prompted for a first-person activation with the HUD reacting before the effect fires."
     },
     {
       "id": "exploration-02",
@@ -73,14 +129,10 @@
       "thumbnail": "/media/thumbnails/example-03.jpg",
       "keep": ["Camera movement", "Environmental reaction", "Overall pacing"],
       "drop": ["Weapon model"]
-    },
-    {
-      "id": "exploration-04",
-      "focus": "Environment response",
-      "type": "image",
-      "media": "/media/images/example-04.jpg",
-      "thumbnail": "/media/thumbnails/example-04.jpg",
-      "keep": ["Energy material", "Ground lighting"]
     }
-  ]
+  ],
+
+  "tools": ["Veo", "After Effects", "Figma"],
+  "discussion": "https://github.com/colbymaloy/WeAreDestiny3/issues/12",
+  "credits": "Tether silhouette study by @someone."
 }

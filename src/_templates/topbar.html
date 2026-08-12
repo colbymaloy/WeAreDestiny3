@@ -1,9 +1,44 @@
-<header class="topbar">
-  <a class="topbar-mark" href="/"><span class="mark"></span>WE ARE DESTINY 3</a>
-  <nav aria-label="Primary">
-    <a href="/#board">Concepts</a>
-    <a href="/contribute/">Contribute</a>
-    <a href="/about/">About</a>
-    <a href="https://github.com/colbymaloy/WeAreDestiny3" rel="noopener">GitHub</a>
+<header class="gheader" data-nav="{{NAV}}">
+  <a class="brand" href="/">
+    <svg class="brand-glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M12 1.6 3.2 7.2v9.6L12 22.4l8.8-5.6V7.2z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <path d="M12 6.4 7.6 9.2v5.6L12 17.6l4.4-2.8V9.2z" fill="currentColor" opacity=".9"/>
+    </svg>
+    <span class="brand-type">
+      <span class="brand-sub">We Are</span>
+      <span class="brand-name">DESTINY <em>3</em><svg class="ph brand-tri" aria-hidden="true" focusable="false"><use href="#ph-triangle-fill"/></svg></span>
+    </span>
+  </a>
+
+  <nav class="gnav" aria-label="Primary">
+    <a href="/" data-nav-id="explore">Explore</a>
+    <a href="/concepts/" data-nav-id="concepts">Concepts</a>
+    <a href="/concepts/?type=prototype" data-nav-id="demos">Demos</a>
+    <a href="/#questions" data-nav-id="questions">Questions</a>
+    <a href="/concepts/?status=direction" data-nav-id="directions">Directions</a>
+    <a href="/about/" data-nav-id="about">About</a>
   </nav>
+
+  <div class="gtools">
+    <form class="gsearch" role="search" action="/concepts/" method="get">
+      <svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+      <input type="search" name="q" placeholder="Search concepts..." aria-label="Search concepts">
+      <kbd>/</kbd>
+    </form>
+
+    <button type="button" class="gicon" aria-label="Notifications">
+      <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M18 8.5a6 6 0 1 0-12 0c0 6-2.2 7.5-2.2 7.5h16.4S18 14.5 18 8.5z"/>
+        <path d="M13.7 20a2 2 0 0 1-3.4 0"/>
+      </svg>
+      <span class="gdot" aria-hidden="true"></span>
+    </button>
+
+    <span class="gtools-sep" aria-hidden="true"></span>
+
+    <button type="button" class="guser" aria-label="Account">
+      <span class="guser-avatar"></span>
+      <svg class="i i-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+  </div>
 </header>

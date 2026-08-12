@@ -1,34 +1,23 @@
 <!--
-  Adding a concept? Create concepts/<your-slug>/concept.json and make sure it validates.
-  Everything else — site changes, tooling — just describe below and delete the checklist
-  that doesn't apply.
+  Most pull requests here are opened automatically by the publish function when
+  someone submits a concept at wearedestiny3.com/contribute. Merging one publishes
+  the concept; closing it declines the submission.
+
+  This template is for changes you make by hand.
 -->
 
-## What this adds
+## What this changes
 
 <!-- One or two sentences. -->
 
 ## Type
 
-- [ ] New concept
-- [ ] Update to an existing concept (new explorations, new moments, status change)
 - [ ] Site or layout change
 - [ ] Tooling / workflow
+- [ ] Content correction on an existing concept
 - [ ] Something else
 
-## If this is a concept
+## Checks
 
-- [ ] It's **one idea** — multiple generations of the same idea are explorations inside it, not separate concepts
-- [ ] `slug` matches the folder name
-- [ ] `creator` is a GitHub username without the `@`
-- [ ] Explorations are labelled by what they were **testing**, not ranked v1/v2/v3
-- [ ] `keep` / `drop` noted on the explorations, including the ones that failed
-- [ ] `status` reflects how settled the idea is, not how good it is
-- [ ] Every video has a `thumbnail`
-- [ ] No video files committed — media points at a GitHub attachment or Release asset
-- [ ] `node .github/scripts/validate.mjs` passes
-- [ ] I have the right to share this work
-
-## Credit
-
-<!-- If this builds on someone else's concept, link them here. -->
+- [ ] `node .github/scripts/preflight.mjs` passes
+- [ ] `node .github/scripts/build.mjs` renders without errors

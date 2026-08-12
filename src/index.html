@@ -4,92 +4,23 @@
 <!--INCLUDE:head.html
   TITLE=WE ARE DESTINY 3
   OG_TITLE=WE ARE DESTINY 3
-  DESCRIPTION=An open community exploration of what Destiny could become. Worlds, weapons, UI, systems, sound and lore — made by anyone, with any tool.
+  DESCRIPTION=An open community concept board for art, lore, gameplay, systems, and direction. Build the future together.
   PATH=/
 -->
+<link rel="stylesheet" href="/assets/home.css?v=5">
 </head>
 
-<body>
+<body class="landing">
 <a class="skip" href="#board">Skip to the concepts</a>
 
-<!--INCLUDE:topbar.html-->
+<!--INCLUDE:topbar.html
+  NAV=explore
+-->
 
-<!-- =========================================================
-     Masthead — the premise in one breath, then straight to the work
-     ========================================================= -->
-<section class="hero">
-  <svg class="traveler" viewBox="0 0 400 400" aria-hidden="true" focusable="false">
-    <g fill="none" stroke="currentColor" stroke-width="0.6">
-      <circle cx="200" cy="200" r="196"/>
-      <circle cx="200" cy="200" r="150"/>
-      <circle cx="200" cy="200" r="92"/>
-      <ellipse cx="200" cy="200" rx="196" ry="58"/>
-      <ellipse cx="200" cy="200" rx="196" ry="120"/>
-      <ellipse cx="200" cy="200" rx="196" ry="168"/>
-      <ellipse cx="200" cy="200" rx="58"  ry="196"/>
-      <ellipse cx="200" cy="200" rx="120" ry="196"/>
-      <ellipse cx="200" cy="200" rx="168" ry="196"/>
-    </g>
-    <g class="glow" fill="none" stroke="currentColor" stroke-width="1.1">
-      <path d="M200 50 L350 200 L200 350 L50 200 Z"/>
-    </g>
-  </svg>
-
-  <div class="hero-body">
-    <p class="masthead-sub reveal">WE ARE</p>
-    <h1 class="masthead reveal d1">DESTINY&nbsp;<em>3</em></h1>
-
-    <p class="lede reveal d2">
-      An open community exploration of what Destiny could become.
-    </p>
-
-    <div class="hero-actions reveal d3">
-      <a class="btn btn-primary" href="#board">Explore concepts</a>
-      <a class="btn btn-ghost" href="/contribute/">Contribute</a>
-    </div>
-  </div>
-</section>
-
-<!-- =========================================================
-     Filters — generated from the concepts that exist
-     ========================================================= -->
-<nav class="filters" id="filters" aria-label="Filter concepts by category"><!--SLOT:FILTERS--></nav>
-
-<!-- =========================================================
-     The board — one card per concept, never per generation
-     ========================================================= -->
-<main>
-  <section class="board" id="board" aria-labelledby="board-title">
-    <h2 class="sr" id="board-title">Concepts</h2>
-    <div class="grid" id="grid"><!--SLOT:CARDS--></div>
-  </section>
-
-  <!-- =======================================================
-       Open briefs — the board is never empty. Until someone
-       answers a question, the question holds the space.
-       ======================================================= -->
-  <section class="section" id="briefs" aria-labelledby="briefs-title">
-    <div class="section-head">
-      <h2 class="section-title" id="briefs-title"><span class="mark"></span>Open briefs</h2>
-      <p class="section-note">Nobody has claimed these. Answer one and it becomes a concept.</p>
-    </div>
-
-    <div class="brief-grid">
-      <article class="brief"><q>What should firing a weapon feel like in Destiny 3?</q><footer>Unanswered — Gameplay</footer></article>
-      <article class="brief"><q>What replaces the current ability HUD?</q><footer>Unanswered — UI</footer></article>
-      <article class="brief"><q>What does the next evolution of a Super look like?</q><footer>Unanswered — Abilities</footer></article>
-      <article class="brief"><q>What destination couldn't have existed in Destiny 2?</q><footer>Unanswered — Worlds</footer></article>
-      <article class="brief"><q>How should a fireteam interact outside combat?</q><footer>Unanswered — Social</footer></article>
-      <article class="brief"><q>What would make exploration meaningful?</q><footer>Unanswered — Gameplay</footer></article>
-      <article class="brief"><q>What does a next-generation raid encounter look like?</q><footer>Unanswered — Gameplay</footer></article>
-      <article class="brief"><q>How should armor customization evolve?</q><footer>Unanswered — Armor</footer></article>
-      <article class="brief"><q>What should the Tower become?</q><footer>Unanswered — Worlds</footer></article>
-    </div>
-  </section>
-</main>
+<!--SLOT:LANDING-->
 
 <!--INCLUDE:footer.html-->
 
-<script src="/assets/board.js" type="module"></script>
+<script src="/assets/home.js?v=5" type="module"></script>
 </body>
 </html>

@@ -1,0 +1,242 @@
+{
+  "$comment": "Landing-screen content. Real concepts and questions from concepts/ and questions/ replace these as soon as any exist — this is what the board shows while it is still empty. Counts here are placeholder figures, not measured values.",
+  "summary": {
+    "contributors": 2847,
+    "concepts": 15642,
+    "directions": 91
+  },
+  "categories": [
+    {
+      "id": "all",
+      "label": "All",
+      "icon": "grid"
+    },
+    {
+      "id": "gameplay",
+      "label": "Gameplay",
+      "icon": "gamepad"
+    },
+    {
+      "id": "worlds",
+      "label": "Worlds",
+      "icon": "globe"
+    },
+    {
+      "id": "lore",
+      "label": "Lore",
+      "icon": "book"
+    },
+    {
+      "id": "systems",
+      "label": "Systems",
+      "icon": "layers"
+    },
+    {
+      "id": "ui",
+      "label": "UI",
+      "icon": "monitor"
+    },
+    {
+      "id": "weapons",
+      "label": "Weapons",
+      "icon": "weapon"
+    },
+    {
+      "id": "abilities",
+      "label": "Abilities",
+      "icon": "ability"
+    },
+    {
+      "id": "social",
+      "label": "Social",
+      "icon": "users"
+    },
+    {
+      "id": "audio",
+      "label": "Audio",
+      "icon": "audio"
+    }
+  ],
+  "concepts": [
+    {
+      "id": "the-pale-frontier",
+      "title": "The Pale Frontier",
+      "description": "A lawless expanse beyond the City. New threats. New alliances. Untold secrets beneath the ice.",
+      "author": "ErebusLich",
+      "avatar": [
+        "#3C2A6E",
+        "#1B1230"
+      ],
+      "category": "world",
+      "categoryLabel": "World Direction",
+      "visualType": "image",
+      "thumbnail": "/media/hero/frontier.jpg",
+      "views": "2.1K",
+      "contributors": 24,
+      "bookmarked": false,
+      "filter": "worlds"
+    },
+    {
+      "id": "rethinking-supers",
+      "title": "Rethinking Supers",
+      "description": "Supers should feel earned, impactful, and build on your moment-to-moment decisions. Explore new models for expression, risk, and counterplay.",
+      "author": "Bastion_42",
+      "avatar": [
+        "#5A2E86",
+        "#241041"
+      ],
+      "category": "design",
+      "categoryLabel": "Gameplay Design",
+      "visualType": "image",
+      "views": "1.6K",
+      "contributors": 18,
+      "bookmarked": false,
+      "filter": "gameplay",
+      "thumbnail": "/media/concepts/c1.jpg"
+    },
+    {
+      "id": "the-second-collapse",
+      "title": "The Second Collapse",
+      "description": "What if the Collapse wasn't the end, but a cycle? Exploring the causes, survivors, and consequences of humanity's next fall.",
+      "author": "CipherLore",
+      "avatar": [
+        "#25543C",
+        "#0F2519"
+      ],
+      "category": "lore",
+      "categoryLabel": "Lore / Story",
+      "visualType": "image",
+      "views": "1.2K",
+      "contributors": 27,
+      "bookmarked": false,
+      "filter": "lore",
+      "thumbnail": "/media/concepts/c2.jpg"
+    },
+    {
+      "id": "living-destinations",
+      "title": "Living Destinations",
+      "description": "Destinations that evolve with player actions, time, and story. Persistent changes that make the world feel alive and responsive.",
+      "author": "SystemSpecter",
+      "avatar": [
+        "#1F3E6B",
+        "#0D1B30"
+      ],
+      "category": "systems",
+      "categoryLabel": "Systems Design",
+      "visualType": "text",
+      "views": "980",
+      "contributors": 16,
+      "bookmarked": false,
+      "filter": "systems"
+    },
+    {
+      "id": "ability-hud-evolution",
+      "title": "Ability HUD Evolution",
+      "description": "Iterating on clarity, readability, and immersion for the next generation of on-screen information.",
+      "author": "QuietSignal",
+      "avatar": [
+        "#4A2478",
+        "#1D0F32"
+      ],
+      "category": "visual",
+      "categoryLabel": "UI / Visual",
+      "visualType": "image",
+      "views": "1.4K",
+      "contributors": 22,
+      "bookmarked": false,
+      "filter": "ui",
+      "thumbnail": "/media/concepts/c3.jpg"
+    },
+    {
+      "id": "classless-guardians",
+      "title": "Should Destiny 3 still have classes?",
+      "description": "A prototype exploring a classless foundation with identity built through choices, not restrictions.",
+      "author": "ProtoGuard",
+      "avatar": [
+        "#6B4419",
+        "#2E1C09"
+      ],
+      "category": "prototype",
+      "categoryLabel": "Prototype / Question",
+      "visualType": "question",
+      "views": "2.3K",
+      "contributors": 61,
+      "bookmarked": false,
+      "filter": "gameplay"
+    }
+  ],
+  "questions": [
+    {
+      "id": "core-loop",
+      "question": "What's the core loop that would keep you logged in for years?",
+      "responses": 182,
+      "conceptsInspired": 47,
+      "participants": [
+        [
+          "#4B2E7A",
+          "#24173F"
+        ],
+        [
+          "#2A4A6E",
+          "#12213A"
+        ],
+        [
+          "#6B3A2A",
+          "#2F1810"
+        ],
+        [
+          "#3B5C3A",
+          "#182818"
+        ]
+      ]
+    },
+    {
+      "id": "consequences",
+      "question": "How should consequences shape the world and its stories?",
+      "responses": 146,
+      "conceptsInspired": 38,
+      "participants": [
+        [
+          "#5A2E86",
+          "#241041"
+        ],
+        [
+          "#25543C",
+          "#0F2519"
+        ],
+        [
+          "#1F3E6B",
+          "#0D1B30"
+        ],
+        [
+          "#6B4419",
+          "#2E1C09"
+        ]
+      ]
+    },
+    {
+      "id": "solo-and-fireteam",
+      "question": "How can solo and fireteam play feel equally rewarding?",
+      "responses": 118,
+      "conceptsInspired": 29,
+      "participants": [
+        [
+          "#6B3A2A",
+          "#2F1810"
+        ],
+        [
+          "#3C2A6E",
+          "#1B1230"
+        ],
+        [
+          "#25543C",
+          "#0F2519"
+        ],
+        [
+          "#2A4A6E",
+          "#12213A"
+        ]
+      ]
+    }
+  ]
+}

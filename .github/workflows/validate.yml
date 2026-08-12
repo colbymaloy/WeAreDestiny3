@@ -1,19 +1,18 @@
-name: Validate concepts
+name: Check
 
+# The site deploys from Firebase, not from here. This just keeps the shared
+# renderer and static shell from breaking on a pull request.
 on:
   pull_request:
-    paths:
-      - 'concepts/**'
-      - 'media/**'
-      - 'src/**'
-      - '.github/scripts/**'
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  validate:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,9 +20,8 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Validate concept data
-        run: node .github/scripts/validate.mjs
-
-      # Catches template and rendering errors before they reach main.
-      - name: Build site
+      - name: Build the static shell
         run: node .github/scripts/build.mjs
+
+      - name: Preflight
+        run: node .github/scripts/preflight.mjs

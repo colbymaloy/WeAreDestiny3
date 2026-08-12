@@ -40,8 +40,15 @@ concepts/super-activation-redesign/  →  media/thumbnails/super-activation-rede
                                         media/thumbnails/super-activation-redesign-02.jpg
 ```
 
-## branding/social-card.png
+## branding/
 
-The default Open Graph image — what appears when wearedestiny3.com is shared anywhere. 1200×630.
-Concept pages override it with their own cover, so this one only covers the homepage, about and
-contribute. Until it exists, those links preview as plain text.
+| File | What it is |
+|---|---|
+| `banner.jpg` | 1600×840. The README header |
+| `social-card.jpg` | 1200×630. The default Open Graph image — what appears when a wearedestiny3.com link is shared |
+
+Concept pages override the social card with their own cover, so `social-card.jpg` covers the
+homepage, about, contribute and publish.
+
+Both are JPEG rather than PNG on purpose: the same artwork was 2 MB as a PNG and is 400 KB as a
+quality-88 JPEG, with no visible loss on the type.

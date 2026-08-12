@@ -1,0 +1,39 @@
+rules_version = '2';
+
+// The board is public to read and writable only by the functions, which use
+// admin credentials and bypass these rules entirely.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /concepts/{slug} {
+      // Only approved concepts are visible to the public.
+      allow read: if resource.data.review == 'published';
+      allow write: if false;
+    }
+
+    match /questions/{slug} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Claimed handles. Public read so the claim form can check availability;
+    // the document holds no uid, so a read answers "is this taken" and
+    // nothing about who holds it. Written only by the claim function.
+    match /handles/{handle} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // A person's handle and rate-limit bookkeeping — visible only to them.
+    match /publishers/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // Moderator allowlist. Added by hand in the console; never client-writable.
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+  }
+}

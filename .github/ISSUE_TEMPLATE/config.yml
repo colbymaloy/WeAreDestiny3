@@ -1,8 +1,10 @@
-blank_issues_enabled: true
+# Concepts are submitted at wearedestiny3.com/contribute — not here. GitHub is
+# where the site is built and reviewed, not where people contribute.
+blank_issues_enabled: false
 contact_links:
-  - name: Discuss an idea
-    url: https://github.com/colbymaloy/WeAreDestiny3/discussions
-    about: Half-formed ideas, questions, feedback on someone else's concept, or looking for a collaborator.
-  - name: How contributing works
-    url: https://github.com/colbymaloy/WeAreDestiny3/blob/main/CONTRIBUTING.md
-    about: Both routes in — the Issue form and pull requests — explained end to end.
+  - name: Publish a concept
+    url: https://wearedestiny3.com/contribute/
+    about: Post an idea for what Destiny should become. This is the only submission route.
+  - name: Something on the site is broken
+    url: https://wearedestiny3.com/contribute/
+    about: How to report a problem.

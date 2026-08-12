@@ -1,0 +1,15 @@
+{
+  "name": "wearedestiny3",
+  "private": true,
+  "type": "module",
+  "description": "An open community concept board imagining the future of Destiny.",
+  "scripts": {
+    "build": "node .github/scripts/build.mjs",
+    "validate": "node .github/scripts/validate.mjs",
+    "preflight": "node .github/scripts/preflight.mjs",
+    "check": "npm run validate && npm run build && npm run preflight",
+    "dev": "npm run build && python3 -m http.server 8000 --directory _site",
+    "emulators": "npm --prefix functions run bundle && firebase emulators:start",
+    "deploy": "npm run build && firebase deploy"
+  }
+}

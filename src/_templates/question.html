@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!--INCLUDE:head.html
+  TITLE={{TITLE}} — WE ARE DESTINY 3
+  OG_TITLE={{TITLE}}
+  DESCRIPTION={{DESCRIPTION}}
+  PATH={{PATH}}
+-->
+</head>
+
+<body>
+<a class="skip" href="#answers">Skip to the answers</a>
+
+<!--INCLUDE:topbar.html
+  NAV=questions
+-->
+
+<main class="concept">
+  <div class="concept-head question-head">
+    <div class="concept-tags">
+      <span class="type type-question">Open question</span>
+      <p class="eyebrow">{{CATEGORIES}}</p>
+      <span class="status status-exploring">{{COUNT}}</span>
+    </div>
+    <h1 class="question-title">{{QUESTION}}</h1>
+  </div>
+
+  {{CONTEXT}}
+
+  <div class="question-actions">
+    <a class="btn btn-primary" href="/contribute/">Answer this</a>
+    {{DISCUSSION}}
+  </div>
+
+  <section class="section" id="answers" aria-labelledby="answers-title">
+    <div class="section-head">
+      <h2 class="section-title" id="answers-title"><span class="mark"></span>Concepts answering this</h2>
+      <p class="section-note">They do not have to agree with each other. Competing answers are the point.</p>
+    </div>
+    {{ANSWERS}}
+  </section>
+</main>
+
+<!--INCLUDE:footer.html-->
+
+<script src="/assets/board.js?v=5" type="module"></script>
+</body>
+</html>

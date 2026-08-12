@@ -1,0 +1,18 @@
+{
+  "name": "wearedestiny3-functions",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.mjs",
+  "scripts": {
+    "bundle": "node prepare.mjs",
+    "serve": "npm run bundle && firebase emulators:start",
+    "deploy": "npm run bundle && firebase deploy --only functions,hosting"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.3.0",
+    "firebase-functions": "^5.0.1"
+  }
+}

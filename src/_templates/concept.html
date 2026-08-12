@@ -8,46 +8,17 @@
   PATH={{PATH}}
   IMAGE={{IMAGE}}
 -->
+<link rel="stylesheet" href="/assets/home.css?v=5">
 </head>
 
-<body>
-<a class="skip" href="#idea">Skip to the idea</a>
+<body class="detail">
+<a class="skip" href="#main">Skip to the concept</a>
 
-<!--INCLUDE:topbar.html-->
+<!--INCLUDE:topbar.html
+  NAV=concepts
+-->
 
-<main class="concept">
-  <div class="concept-head">
-    <div class="concept-tags">
-      <p class="eyebrow">{{CATEGORIES}}</p>
-      <span class="status status-{{STATUS}}">{{STATUS_LABEL}}</span>
-    </div>
-    <h1 class="concept-title">{{TITLE}}</h1>
-    <p class="concept-by">{{BYLINE}}</p>
-  </div>
-
-  <!-- 1. Selected direction — the closest representation of the idea -->
-  {{HERO}}
-
-  <!-- 2. The idea -->
-  <section class="section section-tight" id="idea" aria-labelledby="idea-title">
-    <div class="section-head">
-      <h2 class="section-title" id="idea-title"><span class="mark"></span>The idea</h2>
-    </div>
-    <div class="idea">
-      <p class="idea-body">{{SUMMARY}}</p>
-      <div>{{SIDEBAR}}</div>
-    </div>
-  </section>
-
-  <!-- 3. Key takeaways — what this concept is arguing for -->
-  {{TAKEAWAYS}}
-
-  <!-- 4. Selected moments — the seconds worth keeping, wherever they came from -->
-  {{MOMENTS}}
-
-  <!-- 5. Explorations — evidence under the idea, not entries of their own -->
-  {{EXPLORATIONS}}
-</main>
+{{CONCEPT}}
 
 <dialog class="lb" id="lightbox" aria-labelledby="lb-title">
   <div class="lb-layout">
@@ -63,6 +34,6 @@
 
 <!--INCLUDE:footer.html-->
 
-<script src="/assets/concept.js" type="module"></script>
+<script src="/assets/concept.js?v=5" type="module"></script>
 </body>
 </html>

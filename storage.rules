@@ -1,0 +1,22 @@
+rules_version = '2';
+
+// Media lives here permanently — it is what the board serves.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /media/{uid}/{file} {
+      // Anyone can view published media; the board is public.
+      allow read: if true;
+
+      // Signed-in users write only into their own folder, images and video
+      // only, capped so a single upload cannot run up the bill.
+      allow write: if request.auth != null
+                   && request.auth.uid == uid
+                   && request.resource.size < 100 * 1024 * 1024
+                   && (request.resource.contentType.matches('image/.*')
+                       || request.resource.contentType.matches('video/(mp4|quicktime|webm)'));
+
+      // Removal goes through a person, not the uploader.
+      allow delete: if false;
+    }
+  }
+}

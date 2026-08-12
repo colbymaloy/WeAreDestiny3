@@ -1,23 +1,25 @@
 /* =============================================================
-   On-site publishing.
+   Sharing a concept.
 
-   Sign in, describe the concept, attach media. Media uploads straight
-   to Storage; the concept goes to Firestore as pending, and an admin
-   approves it onto the board.
+   Sign in, claim a handle, write the concept, attach media. Media
+   uploads straight to Storage; the concept goes to Firestore as
+   pending, and a person approves it onto the board.
    ============================================================= */
 
 import {
-  TYPES, CATEGORIES, STATUSES, RELATIONS, MAX, TEXT_FIRST,
-  slugify, validateShape, handleProblem, foldHandle, articleText,
+  TYPES, CATEGORIES, CATEGORY_LABEL, STATUSES, RELATIONS, MAX, TEXT_FIRST,
+  slugify, handleProblem, foldHandle, articleText,
 } from '/assets/model.mjs';
 import { renderOverview } from '/assets/render.mjs';
 import { iconSprite } from '/assets/icons.mjs';
-import { createEditor } from '/assets/editor.js?v=7';
-import { createConceptPicker } from '/assets/picker.js?v=7';
+import { createEditor } from '/assets/editor.js?v=8';
+import { createConceptPicker } from '/assets/picker.js?v=8';
 import { firebaseConfig, isConfigured } from '/assets/firebase-config.js';
 
 const el = id => document.getElementById(id);
-const show = (node, on = true) => { node.hidden = !on; };
+const show = (node, on = true) => { if (node) node.hidden = !on; };
+const lines = value => String(value || '').split('\n').map(s => s.trim()).filter(Boolean);
+const commas = value => String(value || '').split(',').map(s => s.trim()).filter(Boolean);
 
 const useEmulators = () =>
   ['localhost', '127.0.0.1'].includes(location.hostname)
@@ -34,11 +36,11 @@ const claimEndpoint = () => fn('claimHandle', '/api/claim');
 const state = {
   user: null,
   token: null,
+  handle: null,
   concepts: [],
   questions: [],
-  blocks: [],
-  explorations: [],
-  connections: [],
+  categories: [],
+  cover: null,
   seq: 0,
 };
 
@@ -48,7 +50,6 @@ if (!isConfigured() && !useEmulators()) {
   show(el('auth-out'), false);
   show(el('auth-unconfigured'));
 } else {
-  /* A blocked or failed SDK should say so, not leave a dead button. */
   start().catch(error => {
     console.error('[publish] sign-in unavailable', error);
     show(el('auth-out'), false);
@@ -69,9 +70,6 @@ async function start() {
   const bucket = storage.getStorage(app);
   const db = firestore.getFirestore(app);
 
-  /* Local testing: serve the site and open /publish/?emu to point auth and
-     storage at the Firebase emulators instead of the live project. Without
-     the flag, localhost still talks to production — so you can test either. */
   if (useEmulators()) {
     auth.connectAuthEmulator(authClient, 'http://localhost:9099', { disableWarnings: true });
     storage.connectStorageEmulator(bucket, 'localhost', 9199);
@@ -84,8 +82,6 @@ async function start() {
   });
   el('sign-out').addEventListener('click', () => auth.signOut(authClient));
 
-  /* The handle this account already claimed, if any. Reading our own
-     publisher record is all the rules allow, which is all we need. */
   state.myHandle = async uid => {
     const snap = await firestore.getDoc(firestore.doc(db, 'publishers', uid));
     return snap.data()?.handle ?? null;
@@ -117,13 +113,14 @@ async function start() {
 }
 
 function reportAuthError(error) {
-  /* A popup the person closed themselves is not worth an error panel. */
   if (['auth/popup-closed-by-user', 'auth/cancelled-popup-request'].includes(error?.code)) return;
   problems([`Sign-in failed — ${error?.message || error}`]);
 }
 
-/* The account's real name is never shown and never suggested. A handle is the
+/* --- handle ---------------------------------------------------------------
+   The account's real name is never shown and never suggested. A handle is the
    only name this project has, and it is chosen, not derived. */
+
 async function onSignedIn(user) {
   state.handle = await state.myHandle(user.uid);
   paintHandle();
@@ -135,7 +132,6 @@ function paintHandle() {
   show(el('handle-claim'), !claimed);
   show(el('handle-set'), claimed);
   if (claimed) el('handle-current').textContent = `@${state.handle}`;
-  /* Nothing can be submitted anonymously, so the form waits. */
   el('form').classList.toggle('is-locked', !claimed);
 }
 
@@ -144,7 +140,7 @@ const handleNote = el('handle-note');
 let handleTimer;
 
 function noteHandle(text, kind) {
-  handleNote.textContent = text;
+  handleNote.textContent = text ?? '';
   handleNote.dataset.kind = kind ?? '';
 }
 
@@ -197,7 +193,7 @@ el('claim-handle')?.addEventListener('click', async () => {
   }
 });
 
-/* --- static option lists -------------------------------------------------- */
+/* --- static option lists --------------------------------------------------- */
 
 function option(value, label) {
   const node = document.createElement('option');
@@ -209,79 +205,41 @@ function option(value, label) {
 el('f-type').append(...Object.entries(TYPES).map(([id, meta]) => option(id, `${meta.label} — ${meta.blurb}`)));
 el('f-status').append(...Object.entries(STATUSES).map(([id, label]) => option(id, label)));
 
-el('f-categories').append(...CATEGORIES.map(category => {
-  const wrap = document.createElement('label');
-  wrap.className = 'check';
-  wrap.innerHTML = `<input type="checkbox" value="${category.id}"><span>${category.label}</span>`;
-  return wrap;
-}));
-
-/* The board's own data, so citations can only point at concepts that exist. */
-fetch('/concepts.json')
-  .then(response => response.ok ? response.json() : { concepts: [], questions: [] })
-  .then(data => {
-    state.concepts = data.concepts ?? [];
-    state.questions = data.questions ?? [];
-    el('f-question').append(
-      option('', 'Not answering a specific question'),
-      ...state.questions.map(q => option(q.slug, q.question)),
-    );
-  })
-  .catch(() => { /* an empty board is a valid starting state */ });
-
-/* --- live preview ---------------------------------------------------------
-   Rendered by the same function the concept page uses, so what you see here
-   cannot drift from what gets published. Media that has not been uploaded yet
-   previews from a local blob URL. */
-
-const preview = el('preview-body');
-
-/* The rendered markup references icons by id, so the sheet has to be on the
-   page too. */
-if (preview) preview.insertAdjacentHTML('beforebegin', iconSprite());
-
-function paintPreview() {
-  if (!preview) return;
-
-  preview.innerHTML = renderOverview({
-    /* The stored article is sanitised on submit; here it is this browser's
-       own markup being shown back to the person who just typed it. */
-    article: editor ? editor.html : '',
-    body: [],
-    takeaways: lines(el('f-takeaways').value),
-    explorations: [],
-    connections: [],
-    citedBy: [],
-  });
-}
-
-let previewTimer;
-const schedulePreview = () => {
-  clearTimeout(previewTimer);
-  previewTimer = setTimeout(paintPreview, 200);
+const STATUS_NOTE = {
+  exploring: 'Open question. Nothing settled yet.',
+  direction: 'Has momentum and more than one exploration behind it.',
+  refined: 'A polished representation others can build on.',
 };
+const paintStatusNote = () => { el('status-note').textContent = STATUS_NOTE[el('f-status').value] ?? ''; };
+el('f-status').addEventListener('change', paintStatusNote);
+paintStatusNote();
 
-el('form')?.addEventListener('input', schedulePreview);
-el('form')?.addEventListener('change', schedulePreview);
+/* --- categories as chips ---------------------------------------------------
+   Nine of them, so a menu of every one is friendlier than a search. */
 
-/* --- repeatable rows ------------------------------------------------------ */
-
-function row(container, className, build) {
-  const node = document.createElement('div');
-  node.className = className;
-  const remove = document.createElement('button');
-  remove.type = 'button';
-  remove.className = 'row-remove';
-  remove.setAttribute('aria-label', 'Remove');
-  remove.textContent = '✕';
-  remove.addEventListener('click', () => { node.remove(); refreshCovers(); });
-  build(node);
-  node.append(remove);
-  container.append(node);
-  return node;
+function paintCategories() {
+  const host = el('f-categories');
+  host.replaceChildren(...CATEGORIES.map(category => {
+    const on = state.categories.includes(category.id);
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'tag';
+    chip.setAttribute('aria-pressed', String(on));
+    chip.textContent = category.label;
+    chip.disabled = !on && state.categories.length >= MAX.categories;
+    chip.addEventListener('click', () => {
+      state.categories = on
+        ? state.categories.filter(id => id !== category.id)
+        : [...state.categories, category.id];
+      paintCategories();
+      touched();
+    });
+    return chip;
+  }));
 }
+paintCategories();
 
-/* --- the concept itself --------------------------------------------------- */
+/* --- the concept itself ---------------------------------------------------- */
 
 const editorHost = el('editor');
 const editor = editorHost ? createEditor(editorHost, {
@@ -292,134 +250,302 @@ const editor = editorHost ? createEditor(editorHost, {
     if (!state.user) throw new Error('sign in first');
     return state.upload(file, state.user.uid);
   },
-  onChange: () => schedulePreview(),
+  onChange: () => touched(),
 }) : null;
+
+/* --- cover ----------------------------------------------------------------- */
+
+const coverInput = el('f-cover');
+const drop = el('cover-drop');
+
+function paintCover() {
+  const set = Boolean(state.cover);
+  show(el('cover-set'), set);
+  show(drop, !set);
+  if (!set) return;
+  el('cover-name').textContent = state.cover.file.name;
+  el('cover-shot').style.backgroundImage = state.cover.preview ? `url(${state.cover.preview})` : '';
+  el('cover-shot').classList.toggle('is-video', state.cover.file.type.startsWith('video/'));
+}
+
+function takeCover(file) {
+  if (!file) return;
+  if (state.cover?.preview) URL.revokeObjectURL(state.cover.preview);
+  state.cover = {
+    file,
+    /* Video posters would need a frame grab; a label is honest enough here. */
+    preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : '',
+  };
+  paintCover();
+  touched();
+}
+
+drop?.addEventListener('click', () => coverInput.click());
+drop?.addEventListener('keydown', event => {
+  if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); coverInput.click(); }
+});
+coverInput?.addEventListener('change', () => takeCover(coverInput.files[0]));
+
+for (const type of ['dragenter', 'dragover']) {
+  drop?.addEventListener(type, event => { event.preventDefault(); drop.classList.add('is-over'); });
+}
+for (const type of ['dragleave', 'drop']) {
+  drop?.addEventListener(type, () => drop.classList.remove('is-over'));
+}
+drop?.addEventListener('drop', event => {
+  event.preventDefault();
+  takeCover([...(event.dataTransfer?.files ?? [])][0]);
+});
+
+el('cover-clear')?.addEventListener('click', () => {
+  if (state.cover?.preview) URL.revokeObjectURL(state.cover.preview);
+  state.cover = null;
+  coverInput.value = '';
+  paintCover();
+  touched();
+});
+
+/* --- the board, for citations and questions -------------------------------- */
+
+fetch('/concepts.json')
+  .then(response => response.ok ? response.json() : { concepts: [], questions: [] })
+  .then(data => {
+    state.concepts = data.concepts ?? [];
+    state.questions = data.questions ?? [];
+    el('f-question').replaceChildren(
+      option('', 'Not answering a specific question'),
+      ...state.questions.map(q => option(q.slug, q.question)));
+  })
+  .catch(() => { /* an empty board is a valid starting state */ });
+
+/* --- references ------------------------------------------------------------ */
+
+const refs = el('connections');
+
+createConceptPicker(el('ref-picker'), {
+  concepts: () => state.concepts,
+  onPick: concept => { if (concept) addReference(concept); },
+  clearOnPick: true,
+});
+
+function addReference(concept) {
+  if ([...refs.children].some(node => node.dataset.slug === concept.slug)) return;
+
+  const node = document.createElement('div');
+  node.className = 'ref';
+  node.dataset.slug = concept.slug;
+  node.innerHTML = `
+    <div class="ref-top">
+      <span class="ref-face"></span>
+      <span class="ref-body">
+        <span class="ref-title">${concept.title.replace(/[<>&]/g, '')}</span>
+        <span class="ref-by">@${String(concept.creator).replace(/[<>&]/g, '')}</span>
+      </span>
+      <button type="button" class="ref-drop" aria-label="Remove this reference">✕</button>
+    </div>
+    <div class="ref-more">
+      <label class="sr">How it relates</label>
+      <div class="sel sel-sm"><select data-rel></select></div>
+      <label class="sr">Cite one exploration</label>
+      <div class="sel sel-sm"><select data-exploration></select></div>
+      <input data-note placeholder="Referenced for…">
+    </div>`;
+
+  node.querySelector('[data-rel]').append(
+    ...Object.entries(RELATIONS).map(([id, meta]) => option(id, meta.label)));
+
+  const exploration = node.querySelector('[data-exploration]');
+  exploration.append(option('', 'The whole concept'));
+  for (const item of concept.explorations ?? []) {
+    exploration.append(option(item.id, `${item.number} — ${item.focus}`));
+  }
+
+  node.querySelector('.ref-drop').addEventListener('click', () => { node.remove(); touched(); });
+  refs.append(node);
+  touched();
+}
+
+/* --- explorations ---------------------------------------------------------- */
+
+function row(container, className, build) {
+  const node = document.createElement('div');
+  node.className = className;
+  const remove = document.createElement('button');
+  remove.type = 'button';
+  remove.className = 'row-remove';
+  remove.setAttribute('aria-label', 'Remove');
+  remove.textContent = '✕';
+  remove.addEventListener('click', () => { node.remove(); touched(); });
+  build(node);
+  node.append(remove);
+  container.append(node);
+  return node;
+}
 
 function addExploration() {
   const index = el('explorations').children.length + 1;
   row(el('explorations'), 'row', node => {
     node.innerHTML = `
       <p class="row-kicker">Exploration ${String(index).padStart(2, '0')}</p>
-      <div class="field">
-        <label>What was this testing?</label>
-        <input data-focus placeholder="HUD transition" required>
+      <div class="fld">
+        <label class="fld-label">What was this testing?</label>
+        <input data-focus placeholder="HUD transition">
       </div>
-      <div class="field">
-        <label>Media</label>
-        <p class="hint">Image or video. Video needs a poster frame as well.</p>
+      <div class="fld">
+        <label class="fld-label">Media</label>
         <input type="file" data-media accept="image/*,video/mp4,video/quicktime,video/webm">
       </div>
-      <div class="field" data-poster-field hidden>
-        <label>Poster frame</label>
-        <p class="hint">A still from the video, for the board.</p>
+      <div class="fld" data-poster-field hidden>
+        <label class="fld-label">Poster frame</label>
+        <p class="fld-hint">A still from the video, for the board.</p>
         <input type="file" data-thumb accept="image/*">
       </div>
-      <div class="field-pair">
-        <div class="field">
-          <label>Keep <span class="opt">one per line</span></label>
-          <textarea data-keep rows="3" placeholder="HUD collapse"></textarea>
+      <div class="fld-pair">
+        <div class="fld">
+          <label class="fld-label">Keep <span class="opt">one per line</span></label>
+          <textarea data-keep rows="2"></textarea>
         </div>
-        <div class="field">
-          <label>Drop <span class="opt">one per line</span></label>
-          <textarea data-drop rows="3" placeholder="The Super itself"></textarea>
+        <div class="fld">
+          <label class="fld-label">Drop <span class="opt">one per line</span></label>
+          <textarea data-drop rows="2"></textarea>
         </div>
       </div>
-      <div class="field">
-        <label>Tools <span class="opt">optional, comma separated</span></label>
-        <input data-tools placeholder="Veo">
+      <div class="fld">
+        <label class="fld-label">Tools <span class="opt">comma separated</span></label>
+        <input data-tools placeholder="Blender">
       </div>`;
 
     const media = node.querySelector('[data-media]');
     media.addEventListener('change', () => {
-      const isVideo = media.files[0]?.type.startsWith('video/');
-      show(node.querySelector('[data-poster-field]'), Boolean(isVideo));
-      refreshCovers();
+      show(node.querySelector('[data-poster-field]'), Boolean(media.files[0]?.type.startsWith('video/')));
+      touched();
     });
   });
-  refreshCovers();
+  touched();
 }
 
-function addConnection() {
-  row(el('connections'), 'row', node => {
-    node.innerHTML = `
-      <p class="row-kicker">Citation</p>
-      <div class="field-pair">
-        <div class="field">
-          <label>Relationship</label>
-          <select data-rel></select>
-        </div>
-        <div class="field">
-          <label>Concept</label>
-          <p class="hint">Search the board, or paste the link to a concept.</p>
-          <div data-picker></div>
-        </div>
-      </div>
-      <div class="field">
-        <label>Cite one exploration <span class="opt">optional</span></label>
-        <p class="hint">Point at a specific piece rather than the whole concept.</p>
-        <select data-exploration></select>
-      </div>
-      <div class="field-pair" data-range hidden>
-        <div class="field">
-          <label>From <span class="opt">seconds</span></label>
-          <input type="number" data-start min="0" step="0.1" placeholder="4">
-        </div>
-        <div class="field">
-          <label>To <span class="opt">seconds</span></label>
-          <input type="number" data-end min="0" step="0.1" placeholder="8">
-        </div>
-      </div>
-      <div class="field">
-        <label>Referenced for <span class="opt">optional but worth writing</span></label>
-        <textarea data-note rows="2" placeholder="The weapon transformation here is close to how I imagine entering the state."></textarea>
-      </div>`;
+document.querySelector('[data-add-exploration]')?.addEventListener('click', addExploration);
 
-    node.querySelector('[data-rel]').append(
-      ...Object.entries(RELATIONS).map(([id, meta]) => option(id, meta.label)));
+/* --- counters, checklist, draft -------------------------------------------- */
 
-    const exploration = node.querySelector('[data-exploration]');
-    const range = node.querySelector('[data-range]');
+const counter = (field, out) => {
+  const node = el(field);
+  const paint = () => { el(out).textContent = node.value.length; };
+  node.addEventListener('input', paint);
+  paint();
+};
+counter('f-title', 'f-title-count');
+counter('f-summary', 'f-summary-count');
 
-    /* Which explorations can be cited depends on which concept was picked,
-       so the two controls are wired together rather than filled once. */
-    const fillExplorations = target => {
-      exploration.replaceChildren(option('', 'The whole concept'));
-      for (const item of target?.explorations ?? []) {
-        exploration.append(option(item.id, `${item.number} — ${item.focus}`));
-      }
-      show(range, false);
-    };
+/* The checklist reflects the form rather than decorating it, so ticking one
+   off means something happened. */
+function paintChecklist() {
+  const done = {
+    summary: el('f-summary').value.trim().length >= 40,
+    article: articleText(editor?.html).length >= 120,
+    references: refs.children.length > 0,
+    media: Boolean(state.cover) || el('explorations').children.length > 0,
+  };
+  for (const item of el('checklist').children) {
+    item.classList.toggle('is-done', Boolean(done[item.dataset.check]));
+  }
+}
 
-    createConceptPicker(node.querySelector('[data-picker]'), {
-      concepts: () => state.concepts,
-      onPick: fillExplorations,
-    });
+/* Drafts live in this browser. There is no server-side draft, so saying
+   "saved" has to mean saved somewhere real. */
+const DRAFT = 'wad3:draft';
+let draftTimer;
 
-    exploration.addEventListener('change', () => show(range, Boolean(exploration.value)));
-    fillExplorations(null);
+function saveDraft() {
+  const draft = {
+    title: el('f-title').value,
+    summary: el('f-summary').value,
+    type: el('f-type').value,
+    status: el('f-status').value,
+    categories: state.categories,
+    article: editor?.html ?? '',
+    takeaways: el('f-takeaways').value,
+    tools: el('f-tools').value,
+    credits: el('f-credits').value,
+    question: el('f-question').value,
+    at: Date.now(),
+  };
+  try {
+    localStorage.setItem(DRAFT, JSON.stringify(draft));
+    el('draft-state').textContent = 'Draft saved in this browser';
+  } catch {
+    el('draft-state').textContent = '';
+  }
+}
+
+function restoreDraft() {
+  let draft;
+  try { draft = JSON.parse(localStorage.getItem(DRAFT) ?? 'null'); } catch { return; }
+  if (!draft) return;
+
+  el('f-title').value = draft.title ?? '';
+  el('f-summary').value = draft.summary ?? '';
+  if (draft.type) el('f-type').value = draft.type;
+  if (draft.status) el('f-status').value = draft.status;
+  state.categories = (draft.categories ?? []).filter(id => CATEGORY_LABEL[id]);
+  el('f-takeaways').value = draft.takeaways ?? '';
+  el('f-tools').value = draft.tools ?? '';
+  el('f-credits').value = draft.credits ?? '';
+  if (editor && draft.article) editor.html = draft.article;
+
+  paintCategories();
+  paintStatusNote();
+  el('draft-state').textContent = 'Draft restored from this browser';
+  for (const [field, out] of [['f-title', 'f-title-count'], ['f-summary', 'f-summary-count']]) {
+    el(out).textContent = el(field).value.length;
+  }
+}
+
+/** Anything changed: repaint what depends on the form, and save shortly. */
+function touched() {
+  paintChecklist();
+  schedulePreview();
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(saveDraft, 1200);
+}
+
+el('form')?.addEventListener('input', touched);
+el('form')?.addEventListener('change', touched);
+
+/* --- preview ---------------------------------------------------------------
+   Rendered by the same function the concept page uses, so what you see here
+   cannot drift from what gets published. */
+
+const preview = el('preview-body');
+if (preview) preview.insertAdjacentHTML('beforebegin', iconSprite());
+
+function paintPreview() {
+  if (!preview || el('preview').hidden) return;
+  preview.innerHTML = renderOverview({
+    article: editor ? editor.html : '',
+    body: [],
+    takeaways: lines(el('f-takeaways').value),
+    explorations: [],
+    connections: [],
+    citedBy: [],
   });
 }
 
-el('explorations').closest('fieldset').querySelector('[data-add-exploration]')
-  .addEventListener('click', addExploration);
-el('connections').closest('fieldset').querySelector('[data-add-connection]')
-  .addEventListener('click', addConnection);
-
-function refreshCovers() {
-  const select = el('f-cover');
-  const current = select.value;
-  select.replaceChildren(option('', 'No cover — written concept'));
-  [...el('explorations').children].forEach((node, index) => {
-    const focus = node.querySelector('[data-focus]').value || `Exploration ${index + 1}`;
-    select.append(option(`exploration-${String(index + 1).padStart(2, '0')}`, focus));
-  });
-  select.value = current;
+let previewTimer;
+function schedulePreview() {
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(paintPreview, 200);
 }
 
-/* --- assembling the payload ----------------------------------------------- */
+el('preview-toggle')?.addEventListener('click', () => {
+  const panel = el('preview');
+  panel.hidden = !panel.hidden;
+  el('preview-toggle').textContent = panel.hidden ? 'Preview' : 'Hide preview';
+  paintPreview();
+  if (!panel.hidden) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+});
 
-const lines = value => String(value || '').split('\n').map(s => s.trim()).filter(Boolean);
-const commas = value => String(value || '').split(',').map(s => s.trim()).filter(Boolean);
+/* --- collect and check ------------------------------------------------------ */
 
 function collect() {
   const concept = {
@@ -428,7 +554,7 @@ function collect() {
     /* No creator here on purpose. The server stamps the account's handle,
        which is what makes posting as someone else impossible. */
     type: el('f-type').value,
-    categories: [...el('f-categories').querySelectorAll('input:checked')].map(i => i.value),
+    categories: [...state.categories],
     status: el('f-status').value,
     summary: el('f-summary').value.trim(),
     article: editor ? editor.html : '',
@@ -446,19 +572,14 @@ function collect() {
         _thumb: thumb,
       };
     }),
-    connections: [...el('connections').children].map(node => {
-      const start = Number(node.querySelector('[data-start]').value);
-      const end = Number(node.querySelector('[data-end]').value);
+    connections: [...refs.children].map(node => {
       const exploration = node.querySelector('[data-exploration]').value;
       const note = node.querySelector('[data-note]').value.trim();
       const connection = {
         rel: node.querySelector('[data-rel]').value,
-        concept: node.querySelector('[data-concept]').value,
+        concept: node.dataset.slug,
       };
       if (exploration) connection.exploration = exploration;
-      if (exploration && Number.isFinite(start) && Number.isFinite(end) && end > start) {
-        connection.t = [start, end];
-      }
       if (note) connection.note = note;
       return connection;
     }),
@@ -477,99 +598,50 @@ function collect() {
   const question = el('f-question').value;
   if (question) concept.question = question;
 
-  const cover = el('f-cover').value;
-  if (cover) concept.cover = cover;
-
   return concept;
 }
 
-/**
- * Validates against the same rules the build enforces, so nothing gets as far
- * as a pull request that the deploy would reject. Media is still a File here,
- * so it is checked separately.
- */
 function check(concept) {
-  const problems = [];
+  const found = [];
 
-  if (!el('f-rights').checked) problems.push('Confirm you have the right to share this work.');
-  if (!concept.slug) problems.push('Give the concept a title.');
-  if (!concept.categories.length) problems.push('Pick at least one category.');
-  if (concept.categories.length > MAX.categories) problems.push(`At most ${MAX.categories} categories.`);
+  if (!el('f-rights').checked) found.push('Confirm you have the right to share this work.');
+  if (!concept.title) found.push('Give the concept a title.');
+  if (!concept.slug) found.push('That title does not produce a usable web address.');
+  if (!concept.summary) found.push('Write the short description.');
+  if (!concept.categories.length) found.push('Pick at least one category.');
+  if (concept.categories.length > MAX.categories) found.push(`At most ${MAX.categories} categories.`);
 
   if (TEXT_FIRST.has(concept.type) && !articleText(concept.article)) {
-    problems.push(`A ${TYPES[concept.type]?.label ?? concept.type} concept needs the concept written out.`);
+    found.push(`A ${TYPES[concept.type]?.label ?? concept.type} concept needs the idea written out.`);
   }
   if (concept.article.length > MAX.article) {
-    problems.push('The concept is longer than the form accepts — trim it down.');
+    found.push('The concept is longer than the form accepts — trim it down.');
   }
 
   concept.explorations.forEach((exploration, index) => {
     const where = `Exploration ${String(index + 1).padStart(2, '0')}`;
-    if (!exploration._media) problems.push(`${where}: attach the image or video.`);
+    if (!exploration.focus) found.push(`${where}: say what it was testing.`);
+    if (!exploration._media) found.push(`${where}: attach the image or video.`);
     if (exploration.type === 'video' && !exploration._thumb) {
-      problems.push(`${where}: a video needs a poster frame.`);
-    }
-    if (exploration._media && exploration._media.size > 100 * 1024 * 1024) {
-      problems.push(`${where}: ${(exploration._media.size / 1048576).toFixed(0)} MB is over the 100 MB limit.`);
+      found.push(`${where}: a video needs a poster frame.`);
     }
   });
 
-  concept.connections.forEach((connection, index) => {
-    if (!connection.concept) problems.push(`Citation #${index + 1}: choose a concept to cite.`);
-  });
-
-  if (state.concepts.some(c => c.slug === concept.slug)) {
-    problems.push(`A concept called "${concept.slug}" already exists. Change the title.`);
-  }
-
-  /* Shape rules run against a copy with media stubbed, since the real URLs
-     only exist after upload. */
-  const stub = structuredClone({
-    ...concept,
-    explorations: concept.explorations.map(e => ({
-      ...e, _media: undefined, _thumb: undefined,
-      media: 'https://example.invalid/pending',
-      thumbnail: e.type === 'video' ? 'https://example.invalid/pending' : undefined,
-    })),
-  });
-  problems.push(...validateShape(stub));
-
-  return problems;
+  return found;
 }
 
 function problems(list) {
   const node = el('problems');
   if (!list.length) return show(node, false);
   node.innerHTML = `<p class="problems-title">${list.length} thing${list.length === 1 ? '' : 's'} to fix</p>
-    <ul>${list.map(p => `<li>${p.replace(/[<>&]/g, '')}</li>`).join('')}</ul>`;
+    <ul>${list.map(p => `<li>${String(p).replace(/[<>&]/g, '')}</li>`).join('')}</ul>`;
   show(node);
   node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-/* --- submit --------------------------------------------------------------- */
+/* --- submit ----------------------------------------------------------------- */
 
-el('f-summary').addEventListener('input', () => {
-  el('f-summary-count').textContent = el('f-summary').value.length;
-});
-el('explorations').addEventListener('input', event => {
-  if (event.target.matches('[data-focus]')) refreshCovers();
-});
-
-el('preview-toggle').addEventListener('click', () => {
-  const concept = collect();
-  const clean = structuredClone({
-    ...concept,
-    explorations: concept.explorations.map(({ _media, _thumb, ...rest }) => ({
-      ...rest,
-      media: _media ? `(upload: ${_media.name})` : '(none)',
-      ...(_thumb ? { thumbnail: `(upload: ${_thumb.name})` } : {}),
-    })),
-  });
-  el('preview').textContent = JSON.stringify(clean, null, 2);
-  show(el('preview'), el('preview').hidden);
-});
-
-el('form').addEventListener('submit', async event => {
+el('form')?.addEventListener('submit', async event => {
   event.preventDefault();
   const button = el('submit');
   const concept = collect();
@@ -583,6 +655,25 @@ el('form').addEventListener('submit', async event => {
 
   try {
     setLabel('Uploading media…');
+
+    if (state.cover) {
+      const uploaded = await state.upload(state.cover.file, state.user.uid);
+      concept.cover = {
+        type: state.cover.file.type.startsWith('video/') ? 'video' : 'image',
+        media: uploaded.url,
+      };
+      /* A video cover needs a still, and the first exploration poster is the
+         only one we can be sure exists. */
+      if (concept.cover.type === 'video') {
+        const poster = concept.explorations.find(e => e._thumb);
+        if (!poster) {
+          setLabel('Submit for review');
+          button.disabled = false;
+          return problems(['A video cover needs a poster frame — add one as an exploration, or use an image.']);
+        }
+      }
+    }
+
     for (const exploration of concept.explorations) {
       exploration.media = (await state.upload(exploration._media, state.user.uid)).url;
       if (exploration._thumb) {
@@ -590,6 +681,10 @@ el('form').addEventListener('submit', async event => {
       }
       delete exploration._media;
       delete exploration._thumb;
+    }
+
+    if (concept.cover?.type === 'video') {
+      concept.cover.thumbnail = concept.explorations.find(e => e.thumbnail)?.thumbnail;
     }
 
     setLabel('Submitting…');
@@ -607,19 +702,23 @@ el('form').addEventListener('submit', async event => {
       return;
     }
 
+    localStorage.removeItem(DRAFT);
     el('result').innerHTML = `
-      <p class="eyebrow"><span class="mark"></span>Submitted</p>
       <h2>Thanks — it's in the queue.</h2>
       <p>A person reads every submission before it goes on the board. Yours will appear at
          <strong>/concepts/${payload.slug}</strong> once it's approved.</p>
-      <a class="btn btn-primary" href="/">Browse the board</a>`;
+      <a class="hbtn hbtn-primary" href="/concepts/">Browse the board</a>`;
     show(el('result'));
-    show(el('form').querySelector('.submit-row'), false);
+    show(el('form').querySelector('.cw-actions'), false);
     el('result').scrollIntoView({ behavior: 'smooth', block: 'center' });
   } catch (error) {
     problems([`Something went wrong — ${error?.message || error}`]);
   } finally {
     button.disabled = false;
-    setLabel('Submit concept');
+    setLabel('Submit for review');
   }
 });
+
+restoreDraft();
+paintChecklist();
+paintCover();

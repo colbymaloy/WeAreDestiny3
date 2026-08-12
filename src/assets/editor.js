@@ -10,33 +10,32 @@
    support. For a toolbar this size it remains the honest choice.
    ============================================================= */
 
+const BLOCKS = [
+  { value: 'P', label: 'Paragraph' },
+  { value: 'H2', label: 'Heading' },
+  { value: 'H3', label: 'Subheading' },
+  { value: 'BLOCKQUOTE', label: 'Quote' },
+];
+
 const COMMANDS = [
   { key: 'bold', label: 'B', title: 'Bold', style: 'font-weight:700' },
   { key: 'italic', label: 'I', title: 'Italic', style: 'font-style:italic' },
-  { key: 'h2', label: 'H2', title: 'Heading' },
-  { key: 'h3', label: 'H3', title: 'Subheading' },
   { key: 'ul', label: '• List', title: 'Bulleted list' },
   { key: 'ol', label: '1. List', title: 'Numbered list' },
-  { key: 'quote', label: '❝', title: 'Quote' },
   { key: 'link', label: 'Link', title: 'Add a link' },
   { key: 'image', label: 'Image', title: 'Insert an image' },
+  { key: 'undo', label: '↶', title: 'Undo' },
+  { key: 'redo', label: '↷', title: 'Redo' },
 ];
 
 const RUN = {
   bold: () => document.execCommand('bold'),
   italic: () => document.execCommand('italic'),
-  h2: () => block('H2'),
-  h3: () => block('H3'),
   ul: () => document.execCommand('insertUnorderedList'),
   ol: () => document.execCommand('insertOrderedList'),
-  quote: () => block('BLOCKQUOTE'),
+  undo: () => document.execCommand('undo'),
+  redo: () => document.execCommand('redo'),
 };
-
-/** Toggle a block format, so pressing H2 inside an H2 returns to a paragraph. */
-function block(tag) {
-  const current = document.queryCommandValue('formatBlock').toUpperCase();
-  document.execCommand('formatBlock', false, current === tag ? 'P' : tag);
-}
 
 /**
  * @param {HTMLElement} host      where the editor is built
@@ -47,6 +46,19 @@ function block(tag) {
 export function createEditor(host, { upload, onChange } = {}) {
   const bar = document.createElement('div');
   bar.className = 'ed-bar';
+
+  /* A named block format reads better than four unlabelled buttons, and it
+     shows what the cursor is currently inside. */
+  const blocks = document.createElement('select');
+  blocks.className = 'ed-block';
+  blocks.setAttribute('aria-label', 'Text style');
+  for (const { value, label } of BLOCKS) {
+    const node = document.createElement('option');
+    node.value = value;
+    node.textContent = label;
+    blocks.append(node);
+  }
+  bar.append(blocks);
 
   const surface = document.createElement('div');
   surface.className = 'ed-surface';
@@ -62,7 +74,31 @@ export function createEditor(host, { upload, onChange } = {}) {
   file.accept = 'image/*';
   file.hidden = true;
 
-  const changed = () => onChange?.(surface.innerHTML);
+  const words = document.createElement('span');
+  words.className = 'ed-words';
+
+  function countWords() {
+    const text = surface.textContent.trim();
+    const n = text ? text.split(/\s+/).length : 0;
+    words.textContent = `${n} word${n === 1 ? '' : 's'}`;
+  }
+
+  /* Reflect where the cursor is, so the control is a readout as well as a
+     command. */
+  function syncBlock() {
+    const current = (document.queryCommandValue('formatBlock') || 'P').toUpperCase();
+    blocks.value = BLOCKS.some(b => b.value === current) ? current : 'P';
+  }
+
+  blocks.addEventListener('change', () => {
+    surface.focus();
+    document.execCommand('formatBlock', false, blocks.value);
+    changed();
+  });
+
+  for (const type of ['keyup', 'mouseup', 'focus']) surface.addEventListener(type, syncBlock);
+
+  const changed = () => { countWords(); onChange?.(surface.innerHTML); };
 
   for (const command of COMMANDS) {
     const button = document.createElement('button');
@@ -96,7 +132,7 @@ export function createEditor(host, { upload, onChange } = {}) {
     changed();
   }
 
-  const message = document.createElement('p');
+  const message = document.createElement('span');
   message.className = 'ed-note';
   const note = text => { message.textContent = text ?? ''; };
 
@@ -141,7 +177,12 @@ export function createEditor(host, { upload, onChange } = {}) {
 
   surface.addEventListener('input', changed);
 
-  host.append(bar, surface, message, file);
+  const foot = document.createElement('div');
+  foot.className = 'ed-foot';
+  foot.append(words, message);
+
+  host.append(bar, surface, foot, file);
+  countWords();
 
   return {
     get html() { return surface.innerHTML; },

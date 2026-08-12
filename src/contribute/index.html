@@ -2,72 +2,68 @@
 <html lang="en">
 <head>
 <!--INCLUDE:head.html
-  TITLE=Submit a concept — WE ARE DESTINY 3
-  OG_TITLE=Submit a concept
-  DESCRIPTION=Post your idea for what Destiny should become. Any medium, any tool, finished or not.
+  TITLE=Share a concept — WE ARE DESTINY 3
+  OG_TITLE=Share a concept
+  DESCRIPTION=Publish your ideas, directions and prototypes for Destiny 3. The community can explore, discuss and build on your vision.
   PATH=/contribute/
 -->
-<!-- The preview renders real concept-page markup, which lives here. -->
-<link rel="stylesheet" href="/assets/home.css?v=7">
+<link rel="stylesheet" href="/assets/home.css?v=8">
 </head>
 
-<body>
+<body class="compose">
 <a class="skip" href="#form">Skip to the form</a>
 
 <!--INCLUDE:topbar.html
   NAV=contribute
 -->
 
-<main class="page publish" id="main">
-  <div class="page-head">
-    <p class="eyebrow"><span class="mark"></span>Submit</p>
-    <h1 class="page-title">Submit a<br>concept</h1>
-    <p class="lede">
-      Any medium, any tool, finished or not. A person reads every submission before it goes on the
-      board.
+<main class="cw" id="main">
+
+  <a class="cd-back" href="/concepts/">Back to concepts</a>
+
+  <header class="cw-head">
+    <h1 class="cw-title">Share a concept</h1>
+    <p class="cw-sub">
+      Publish your ideas, directions and prototypes for Destiny 3. The community can explore,
+      discuss and build on your vision together.
     </p>
-  </div>
+  </header>
 
-  <!-- Signed out ------------------------------------------------------- -->
+  <!-- Signed out ---------------------------------------------------------- -->
   <section class="auth" id="auth-out">
-    <div class="auth-card">
-      <h2 class="auth-title">Sign in to submit</h2>
-      <p>Signing in keeps your work attached to you, so you get credited when someone builds on it.
-         You choose a handle after signing in — your real name is never shown.</p>
-      <div class="auth-actions">
-        <button type="button" class="btn btn-primary" id="sign-in-google">Continue with Google</button>
-      </div>
-      <p class="auth-note">
-        We store the handle you choose and the account that claimed it. Your name and photo are
-        never shown on the board. <a href="/about/">About this project</a>.
-      </p>
+    <h2 class="auth-title">Sign in to share</h2>
+    <p>Signing in keeps your work attached to you, so you get credited when someone builds on it.
+       You choose a handle after signing in — your real name is never shown.</p>
+    <div class="auth-actions">
+      <button type="button" class="hbtn hbtn-primary" id="sign-in-google">Continue with Google</button>
     </div>
+    <p class="auth-note">
+      We store the handle you choose and the account that claimed it. Your name and photo are never
+      shown on the board. <a href="/about/">About this project</a>.
+    </p>
   </section>
 
-  <!-- Auth unavailable -------------------------------------------------- -->
+  <!-- Auth unavailable ---------------------------------------------------- -->
   <section class="auth" id="auth-unconfigured" hidden>
-    <div class="auth-card">
-      <h2 class="auth-title">Submissions open shortly</h2>
-      <p>The form isn't switched on yet. The board and every concept on it work normally in the
-         meantime.</p>
-      <div class="auth-actions">
-        <a class="btn btn-primary" href="/">Browse the board</a>
-        <a class="btn btn-ghost" href="/about/">About this project</a>
-      </div>
+    <h2 class="auth-title">Submissions open shortly</h2>
+    <p>The form isn't switched on yet. The board and every concept on it work normally in the meantime.</p>
+    <div class="auth-actions">
+      <a class="hbtn hbtn-primary" href="/concepts/">Browse the board</a>
+      <a class="hbtn hbtn-ghost" href="/about/">About this project</a>
     </div>
   </section>
 
-  <!-- Signed in --------------------------------------------------------- -->
+  <!-- Signed in ----------------------------------------------------------- -->
   <div id="auth-in" hidden>
+
     <div class="who">
       <div>
         <p class="who-sub">Posting as</p>
         <p class="who-name" id="who-handle">—</p>
       </div>
-      <button type="button" class="btn btn-ghost" id="sign-out">Sign out</button>
+      <button type="button" class="hbtn hbtn-ghost" id="sign-out">Sign out</button>
     </div>
 
-    <!-- Claim ----------------------------------------------------------- -->
     <section class="claim" id="handle-claim" hidden>
       <h2 class="claim-title">Choose your handle</h2>
       <p class="claim-note">
@@ -79,7 +75,7 @@
         <label class="sr" for="f-handle">Handle</label>
         <input id="f-handle" name="handle" pattern="[A-Za-z0-9_-]{2,32}" maxlength="32"
                autocomplete="off" spellcheck="false" placeholder="lumendust">
-        <button type="button" class="btn btn-primary" id="claim-handle" disabled>Claim handle</button>
+        <button type="button" class="hbtn hbtn-primary" id="claim-handle" disabled>Claim handle</button>
       </div>
       <p class="claim-msg" id="handle-note" role="status" aria-live="polite"></p>
     </section>
@@ -88,143 +84,189 @@
       Handles are permanent.</p>
 
     <form id="form" novalidate>
-      <!-- 1 -->
-      <fieldset class="fs">
-        <legend class="fs-legend"><span class="mark"></span>The idea</legend>
+      <div class="cw-layout">
 
-        <div class="field">
-          <label for="f-title">Title <span class="req">Required</span></label>
-          <input id="f-title" name="title" maxlength="80" required placeholder="Supers as Combat States">
+        <!-- Main column ---------------------------------------------------- -->
+        <div class="cw-main">
+          <div class="cw-cols">
+
+            <div class="cw-fields">
+
+              <div class="fld">
+                <label class="fld-label" for="f-title">Concept title <span class="must">*</span></label>
+                <input id="f-title" name="title" maxlength="80" required placeholder="A new way to…">
+                <p class="fld-count"><span id="f-title-count">0</span> / 80</p>
+              </div>
+
+              <div class="fld">
+                <label class="fld-label" for="f-summary">Short description <span class="must">*</span></label>
+                <p class="fld-hint">Summarise your idea in one or two sentences. This is what shows on the board.</p>
+                <textarea id="f-summary" name="summary" rows="3" maxlength="700" required
+                          placeholder="What is your concept about?"></textarea>
+                <p class="fld-count"><span id="f-summary-count">0</span> / 700</p>
+              </div>
+
+              <div class="fld-pair">
+                <div class="fld">
+                  <label class="fld-label" for="f-type">Kind of concept <span class="must">*</span></label>
+                  <div class="sel"><select id="f-type" name="type" required></select></div>
+                  <p class="fld-hint">What you are actually submitting.</p>
+                </div>
+
+                <div class="fld">
+                  <label class="fld-label" id="tags-label">Categories <span class="must">*</span></label>
+                  <div class="tags" id="f-categories" role="group" aria-labelledby="tags-label"></div>
+                  <p class="fld-hint">Up to three, so people can find it.</p>
+                </div>
+              </div>
+
+              <div class="fld">
+                <label class="fld-label" for="editor">Tell us about your idea <span class="must">*</span></label>
+                <p class="fld-hint">
+                  Explain how it works, why it matters, and how it fits into Destiny 3. Drag an
+                  image in, or use the toolbar.
+                </p>
+                <div class="editor" id="editor"></div>
+              </div>
+
+              <details class="more">
+                <summary class="more-head">More detail <span class="more-hint">takeaways, explorations, credits</span></summary>
+                <div class="more-body">
+
+                  <div class="fld">
+                    <label class="fld-label" for="f-takeaways">Key takeaways</label>
+                    <p class="fld-hint">One per line. These sit beside the writing on your concept page.</p>
+                    <textarea id="f-takeaways" rows="3" placeholder="Duration replaces burst as the design lever"></textarea>
+                  </div>
+
+                  <div class="fld">
+                    <label class="fld-label" for="f-question">Answering a question</label>
+                    <div class="sel"><select id="f-question"></select></div>
+                  </div>
+
+                  <div class="fld">
+                    <label class="fld-label">Visual explorations</label>
+                    <p class="fld-hint">
+                      Attempts at the idea — renders, videos, prototypes. Each becomes its own card
+                      on your concept page.
+                    </p>
+                    <div class="repeat" id="explorations"></div>
+                    <button type="button" class="hbtn hbtn-ghost" data-add-exploration>Add an exploration</button>
+                  </div>
+
+                  <div class="fld-pair">
+                    <div class="fld">
+                      <label class="fld-label" for="f-tools">Tools used</label>
+                      <input id="f-tools" placeholder="Blender, Photoshop">
+                    </div>
+                    <div class="fld">
+                      <label class="fld-label" for="f-credits">Credits</label>
+                      <input id="f-credits" placeholder="Music by @someone">
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <div class="preview" id="preview" hidden>
+                <p class="preview-label">Preview — how this will look on the board</p>
+                <div class="preview-stage detail cd"><div id="preview-body"></div></div>
+              </div>
+
+              <label class="rights">
+                <input type="checkbox" id="f-rights" required>
+                <span>This is my own work, or I have the right to share it here.</span>
+              </label>
+
+              <div class="problems" id="problems" hidden></div>
+
+              <div class="cw-actions">
+                <div class="cw-actions-left">
+                  <button type="button" class="hbtn hbtn-ghost" id="preview-toggle">Preview</button>
+                  <p class="draft-state" id="draft-state" role="status" aria-live="polite"></p>
+                </div>
+                <button type="submit" class="hbtn hbtn-primary" id="submit">Submit for review</button>
+              </div>
+
+              <p class="cw-note">
+                Concepts are read by a person before they go on the board. Yours appears once it is approved.
+              </p>
+
+              <div class="result" id="result" hidden></div>
+            </div>
+
+            <!-- Cover ------------------------------------------------------ -->
+            <aside class="cw-cover">
+              <div class="panel">
+                <h2 class="panel-title">Cover image or video <span class="panel-opt">optional</span></h2>
+
+                <div class="drop" id="cover-drop" tabindex="0" role="button"
+                     aria-label="Add a cover image or video">
+                  <div class="drop-mark"></div>
+                  <p class="drop-lead">Drag and drop media here<br>or <span class="drop-link">click to browse</span></p>
+                  <p class="drop-note">16:9 works best</p>
+                </div>
+                <input type="file" id="f-cover" accept="image/*,video/mp4,video/quicktime,video/webm" hidden>
+
+                <div class="cover-set" id="cover-set" hidden>
+                  <div class="cover-shot" id="cover-shot"></div>
+                  <div class="cover-meta">
+                    <p class="cover-name" id="cover-name"></p>
+                    <button type="button" class="linkish" id="cover-clear">Remove</button>
+                  </div>
+                </div>
+
+                <p class="panel-note">PNG, JPG, GIF, WEBP or MP4. Up to 100MB.</p>
+                <p class="panel-note">Strong visuals help a concept stand out, but are not required.</p>
+              </div>
+            </aside>
+          </div>
         </div>
 
-        <div class="field">
-          <label for="f-type">Type <span class="req">Required</span></label>
-          <p class="hint">
-            A written proposal, a piece of lore, a render, a video and a playable prototype all
-            belong here. Vision, Design and Lore are written types, so they need the proposal
-            section filled in below.
-          </p>
-          <select id="f-type" name="type" required></select>
-        </div>
+        <!-- Sidebar --------------------------------------------------------- -->
+        <aside class="cw-side">
 
-        <div class="field">
-          <span class="label-text">Categories <span class="req">Required</span></span>
-          <p class="hint">Up to three.</p>
-          <div class="checks" id="f-categories"></div>
-        </div>
+          <div class="panel panel-lit">
+            <h2 class="panel-title">Before you publish</h2>
+            <ul class="gate" id="checklist">
+              <li data-check="summary"><span class="gate-mark"></span>
+                <div><h3>Explain the player value</h3><p>Say why this matters, not only what it is.</p></div></li>
+              <li data-check="article"><span class="gate-mark"></span>
+                <div><h3>Write the idea out</h3><p>Enough that someone could argue with it.</p></div></li>
+              <li data-check="references"><span class="gate-mark"></span>
+                <div><h3>Credit what you built on</h3><p>Reference the concepts you took from.</p></div></li>
+              <li data-check="media"><span class="gate-mark"></span>
+                <div><h3>Add media</h3><p>Recommended. Visuals carry an idea further.</p></div></li>
+            </ul>
+          </div>
 
-        <div class="field">
-          <label for="f-status">Status <span class="req">Required</span></label>
-          <p class="hint">How settled the idea is, not how good it is. Most things start at Exploring.</p>
-          <select id="f-status" name="status" required></select>
-        </div>
+          <div class="panel">
+            <div class="fld">
+              <h2 class="panel-title">Status</h2>
+              <div class="sel"><select id="f-status" name="status" required></select></div>
+              <p class="fld-hint" id="status-note">How settled the idea is.</p>
+            </div>
 
-        <div class="field">
-          <label for="f-summary">Summary <span class="req">Required</span></label>
-          <p class="hint">Two to four sentences. This is what shows on the card and in link previews.</p>
-          <textarea id="f-summary" name="summary" rows="4" maxlength="700" required></textarea>
-          <p class="count"><span id="f-summary-count">0</span> / 700</p>
-        </div>
+            <div class="side-rule"></div>
 
-        <div class="field">
-          <label for="f-question">Answering an open question</label>
-          <p class="hint">Optional. Links your concept to a question on the board.</p>
-          <select id="f-question" name="question"></select>
-        </div>
-      </fieldset>
+            <div class="fld">
+              <h2 class="panel-title">References</h2>
+              <p class="fld-hint">Concepts you built on. Search the board, or paste a link.</p>
+              <div id="ref-picker"></div>
+              <div class="refs" id="connections"></div>
+            </div>
+          </div>
 
-      <!-- 2 -->
-      <fieldset class="fs">
-        <legend class="fs-legend"><span class="mark"></span>The concept</legend>
-        <p class="fs-note">
-          Write it out. Headings, lists, quotes and images — drag an image in, or use the button.
-          Required for Vision, Design and Lore.
-        </p>
-        <div class="editor" id="editor"></div>
+          <p class="info">References create real relationships between community ideas — the concept
+            you cite shows yours in its own “Inspired by this”.</p>
+        </aside>
 
-        <div class="preview" id="preview">
-          <p class="preview-label">Preview — how this will look on the board</p>
-          <div class="preview-stage detail cd"><div id="preview-body"></div></div>
-        </div>
-      </fieldset>
-
-      <!-- 3 -->
-      <fieldset class="fs">
-        <legend class="fs-legend"><span class="mark"></span>Key takeaways</legend>
-        <div class="field">
-          <label for="f-takeaways">One claim per line</label>
-          <p class="hint">Optional, up to eight. The specific things your concept is arguing for.</p>
-          <textarea id="f-takeaways" rows="4" placeholder="The HUD reorganizes around the state, not the icon"></textarea>
-        </div>
-      </fieldset>
-
-      <!-- 4 -->
-      <fieldset class="fs">
-        <legend class="fs-legend"><span class="mark"></span>Visual explorations</legend>
-        <p class="fs-note">
-          Optional. Add every attempt you made, including the ones that failed, and say what each was
-          testing. Marking what to keep and what to drop is the most useful thing you can write here.
-          Images and video up to 100&nbsp;MB each.
-        </p>
-        <div class="repeat" id="explorations"></div>
-        <div class="repeat-add">
-          <button type="button" class="btn btn-ghost" data-add-exploration>Add an exploration</button>
-        </div>
-        <div class="field">
-          <label for="f-cover">Cover</label>
-          <p class="hint">Which exploration represents the idea best. Written concepts can skip this.</p>
-          <select id="f-cover"></select>
-        </div>
-      </fieldset>
-
-      <!-- 5 -->
-      <fieldset class="fs">
-        <legend class="fs-legend"><span class="mark"></span>Connections</legend>
-        <p class="fs-note">
-          Optional. If you built on someone else's concept, link it here rather than copying it in.
-          You can point at a whole concept or a few seconds inside one of its explorations, and the
-          original creator gets credited automatically.
-        </p>
-        <div class="repeat" id="connections"></div>
-        <div class="repeat-add">
-          <button type="button" class="btn btn-ghost" data-add-connection>Cite a concept</button>
-        </div>
-      </fieldset>
-
-      <!-- 6 -->
-      <fieldset class="fs">
-        <legend class="fs-legend"><span class="mark"></span>Credits</legend>
-        <div class="field">
-          <label for="f-tools">Tools</label>
-          <p class="hint">Optional. Comma separated.</p>
-          <input id="f-tools" placeholder="Blender, Photoshop, Veo">
-        </div>
-        <div class="field">
-          <label for="f-credits">Built on work from outside the board?</label>
-          <p class="hint">Optional. Name and link them.</p>
-          <input id="f-credits">
-        </div>
-        <div class="field checkbox">
-          <label><input type="checkbox" id="f-rights" required>
-            <span>This is my own work, or I have the right to share it, and I understand it will be
-            published publicly with credit to me. <span class="req">Required</span></span></label>
-        </div>
-      </fieldset>
-
-      <div class="submit-row">
-        <button type="submit" class="btn btn-primary" id="submit">Submit concept</button>
-        <button type="button" class="btn btn-ghost" id="preview-toggle">Preview JSON</button>
       </div>
-
-      <div class="problems" id="problems" hidden></div>
-      <pre class="preview" id="preview" hidden></pre>
-      <div class="result" id="result" hidden></div>
     </form>
   </div>
 </main>
 
 <!--INCLUDE:footer.html-->
 
-<script src="/assets/publish.js?v=7" type="module"></script>
+<script src="/assets/publish.js?v=8" type="module"></script>
 </body>
 </html>

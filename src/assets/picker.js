@@ -62,8 +62,10 @@ const haystack = concept => [
  *                                     it arrives from /concepts.json and a row
  *                                     can be added before that lands
  * @param {function} options.onPick    called with the chosen concept, or null
+ * @param {boolean}  options.clearOnPick  reset after choosing, for a field that
+ *                                        adds to a list rather than holding one
  */
-export function createConceptPicker(host, { concepts = () => [], onPick } = {}) {
+export function createConceptPicker(host, { concepts = () => [], onPick, clearOnPick = false } = {}) {
   const board = typeof concepts === 'function' ? concepts : () => concepts;
 
   let indexed = [];
@@ -159,6 +161,14 @@ export function createConceptPicker(host, { concepts = () => [], onPick } = {}) 
       input.hidden = false;
       input.value = '';
       onPick?.(null);
+      return;
+    }
+
+    if (clearOnPick) {
+      input.value = '';
+      chosen = null;
+      value.value = '';
+      onPick?.(concept);
       return;
     }
 

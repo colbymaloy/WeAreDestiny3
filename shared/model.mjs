@@ -102,6 +102,19 @@ export const BODY_BLOCKS = {
   },
 };
 
+/* What a concept's article may contain. The editor produces exactly this set,
+   and the server strips anything else before storing — the allowlist is the
+   security boundary, so it lives beside the model both ends read. */
+export const ARTICLE_TAGS = [
+  'p', 'br', 'strong', 'em', 'u', 's', 'a',
+  'h2', 'h3', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre',
+  'figure', 'figcaption', 'img', 'hr',
+];
+export const ARTICLE_ATTRS = {
+  a: ['href', 'title'],
+  img: ['src', 'alt'],
+};
+
 export const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
 /* A handle is the only name this project has — no usernames, no display names,
@@ -132,6 +145,7 @@ export function handleProblem(handle) {
 }
 
 export const MAX = {
+  article: 60000,
   title: 80,
   summary: 700,
   categories: 3,
@@ -237,8 +251,19 @@ export function validateShape(concept, { requireSlug = true } = {}) {
       }
     });
   }
-  if (TEXT_FIRST.has(concept.type) && body.length === 0) {
-    fail(`a "${concept.type}" concept needs a "body" — that is where the actual proposal lives`);
+  if ('article' in concept) {
+    if (typeof concept.article !== 'string') {
+      fail('"article" must be a string of markup');
+    } else if (concept.article.length > MAX.article) {
+      fail(`"article" is ${concept.article.length} characters — keep it under ${MAX.article}`);
+    }
+  }
+
+  /* Written types need an argument somewhere. Newer submissions carry it as
+     one article; the concepts seeded before that carry it as blocks. */
+  const hasProse = articleText(concept.article).length > 0 || body.length > 0;
+  if (TEXT_FIRST.has(concept.type) && !hasProse) {
+    fail(`a "${concept.type}" concept needs a written proposal — that is where the actual argument lives`);
   }
 
   const explorations = concept.explorations ?? [];
@@ -350,6 +375,10 @@ export function validateShape(concept, { requireSlug = true } = {}) {
 
   return problems;
 }
+
+/** The words in an article, with the markup taken out. */
+export const articleText = article =>
+  String(article ?? '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 
 export function mediaProblems(item, where) {
   const problems = [];

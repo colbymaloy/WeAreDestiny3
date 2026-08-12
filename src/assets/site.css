@@ -2448,3 +2448,74 @@ body.landing { padding-top: 0; }
   background: #090A0F;
 }
 .preview-stage:empty::after { content: "Nothing to show yet."; color: var(--bone-faint); }
+
+
+/* --- rich text editor ----------------------------------------------------- */
+
+.editor {
+  border: 1px solid var(--line-hi);
+  border-radius: var(--r-lg);
+  background: rgba(6, 10, 18, .7);
+  overflow: hidden;
+}
+.ed-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, .03);
+}
+.ed-btn {
+  min-width: 34px;
+  height: 30px;
+  padding: 0 9px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--bone-dim);
+  font-family: var(--body);
+  font-size: 13px;
+  cursor: pointer;
+}
+.ed-btn:hover { background: rgba(255, 255, 255, .07); color: var(--bone); }
+.ed-btn:active { background: rgba(255, 255, 255, .12); }
+
+.ed-surface {
+  min-height: 320px;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: clamp(16px, 2vw, 26px);
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--bone);
+}
+.ed-surface:focus { outline: none; }
+.ed-surface:focus-visible { outline: 2px solid var(--light); outline-offset: -2px; }
+.ed-surface > :first-child { margin-top: 0; }
+.ed-surface p:empty::before { content: ""; display: inline-block; }
+.ed-note { margin: 0; padding: 0 12px 10px; font-size: .82rem; color: var(--bone-faint); }
+
+/* The editing surface and the finished article share one set of rules, so
+   what is typed is already shaped like what gets published. */
+.ed-surface, .prose { word-break: break-word; }
+.ed-surface h2, .prose h2 { margin: 1.4em 0 .5em; font-family: var(--display); font-size: 1.45rem; font-weight: 700; }
+.ed-surface h3, .prose h3 { margin: 1.3em 0 .4em; font-family: var(--display); font-size: 1.15rem; font-weight: 600; }
+.ed-surface p, .prose p { margin: 0 0 1em; }
+.ed-surface ul, .ed-surface ol, .prose ul, .prose ol { margin: 0 0 1em; padding-left: 1.4em; }
+.ed-surface li, .prose li { margin-bottom: .35em; }
+.ed-surface blockquote, .prose blockquote {
+  margin: 1.2em 0;
+  padding-left: 16px;
+  border-left: 2px solid var(--light);
+  color: var(--bone);
+}
+.ed-surface a, .prose a { color: var(--light); text-decoration: underline; }
+.ed-surface figure, .prose figure { margin: 1.4em 0; }
+.ed-surface img, .prose img { width: 100%; height: auto; border-radius: var(--r-lg); }
+.ed-surface figcaption, .prose figcaption {
+  margin-top: 8px;
+  font-size: .85rem;
+  color: var(--bone-faint);
+}
+.ed-surface hr, .prose hr { margin: 1.6em 0; border: 0; border-top: 1px solid var(--line); }

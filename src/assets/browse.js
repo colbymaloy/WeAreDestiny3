@@ -5,7 +5,7 @@
    page is complete without JavaScript and gains controls with it.
    ============================================================= */
 
-import { showMatching, readQuery, writeQuery } from '/assets/filters.js?v=5';
+import { showMatching, readQuery, writeQuery } from '/assets/filters.js?v=6';
 
 const grid = document.getElementById('browse-grid');
 if (grid) {

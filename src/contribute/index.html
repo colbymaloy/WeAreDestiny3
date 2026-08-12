@@ -8,7 +8,7 @@
   PATH=/contribute/
 -->
 <!-- The preview renders real concept-page markup, which lives here. -->
-<link rel="stylesheet" href="/assets/home.css?v=5">
+<link rel="stylesheet" href="/assets/home.css?v=6">
 </head>
 
 <body>
@@ -94,7 +94,6 @@
 
         <div class="field">
           <label for="f-title">Title <span class="req">Required</span></label>
-          <p class="hint">Name the idea, not the file.</p>
           <input id="f-title" name="title" maxlength="80" required placeholder="Supers as Combat States">
         </div>
 
@@ -136,14 +135,12 @@
 
       <!-- 2 -->
       <fieldset class="fs">
-        <legend class="fs-legend"><span class="mark"></span>Make the case</legend>
+        <legend class="fs-legend"><span class="mark"></span>The concept</legend>
         <p class="fs-note">
-          Build the page one section at a time, in whatever order reads best. Each kind of section
-          looks different on the finished page — the preview below shows exactly what you are
-          making. Written types (Vision, Design and Lore) need at least one.
+          Write it out. Headings, lists, quotes and images — drag an image in, or use the button.
+          Required for Vision, Design and Lore.
         </p>
-        <div class="repeat" id="body-blocks"></div>
-        <div class="repeat-add" id="body-add"></div>
+        <div class="editor" id="editor"></div>
 
         <div class="preview" id="preview">
           <p class="preview-label">Preview — how this will look on the board</p>
@@ -228,6 +225,6 @@
 
 <!--INCLUDE:footer.html-->
 
-<script src="/assets/publish.js?v=5" type="module"></script>
+<script src="/assets/publish.js?v=6" type="module"></script>
 </body>
 </html>

@@ -7,11 +7,12 @@
    ============================================================= */
 
 import {
-  TYPES, CATEGORIES, STATUSES, RELATIONS, BODY_BLOCKS, MAX,
-  slugify, validateShape, handleProblem, foldHandle,
+  TYPES, CATEGORIES, STATUSES, RELATIONS, MAX, TEXT_FIRST,
+  slugify, validateShape, handleProblem, foldHandle, articleText,
 } from '/assets/model.mjs';
 import { renderOverview } from '/assets/render.mjs';
 import { iconSprite } from '/assets/icons.mjs';
+import { createEditor } from '/assets/editor.js?v=6';
 import { firebaseConfig, isConfigured } from '/assets/firebase-config.js';
 
 const el = id => document.getElementById(id);
@@ -214,15 +215,6 @@ el('f-categories').append(...CATEGORIES.map(category => {
   return wrap;
 }));
 
-el('body-add').append(...Object.entries(BODY_BLOCKS).map(([type, spec]) => {
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'btn btn-ghost';
-  button.textContent = `Add ${spec.label.toLowerCase()}`;
-  button.addEventListener('click', () => addBlock(type));
-  return button;
-}));
-
 /* The board's own data, so citations can only point at concepts that exist. */
 fetch('/concepts.json')
   .then(response => response.ok ? response.json() : { concepts: [], questions: [] })
@@ -242,7 +234,6 @@ fetch('/concepts.json')
    previews from a local blob URL. */
 
 const preview = el('preview-body');
-let previewUrls = [];
 
 /* The rendered markup references icons by id, so the sheet has to be on the
    page too. */
@@ -251,20 +242,11 @@ if (preview) preview.insertAdjacentHTML('beforebegin', iconSprite());
 function paintPreview() {
   if (!preview) return;
 
-  for (const url of previewUrls) URL.revokeObjectURL(url);
-  previewUrls = [];
-
-  const draft = collect();
-  const body = draft.body.map(block => {
-    if (block.type !== 'image') return block;
-    if (!block._media) return { ...block, media: '' };
-    const url = URL.createObjectURL(block._media);
-    previewUrls.push(url);
-    return { ...block, media: url };
-  }).filter(block => block.type !== 'image' || block.media);
-
   preview.innerHTML = renderOverview({
-    body,
+    /* The stored article is sanitised on submit; here it is this browser's
+       own markup being shown back to the person who just typed it. */
+    article: editor ? editor.html : '',
+    body: [],
     takeaways: lines(el('f-takeaways').value),
     explorations: [],
     connections: [],
@@ -298,43 +280,19 @@ function row(container, className, build) {
   return node;
 }
 
-function addBlock(type) {
-  const spec = BODY_BLOCKS[type];
-  row(el('body-blocks'), 'row', node => {
-    node.dataset.blockType = type;
+/* --- the concept itself --------------------------------------------------- */
 
-    if (type === 'image') {
-      node.innerHTML = `
-        <p class="row-kicker">${spec.label}</p>
-        <div class="field">
-          <label>Heading <span class="opt">optional</span></label>
-          <input data-heading placeholder="What this shows">
-        </div>
-        <div class="field">
-          <label>Image</label>
-          <p class="hint">${spec.blurb}</p>
-          <input type="file" data-image accept="image/*">
-        </div>
-        <div class="field">
-          <label>Caption <span class="opt">optional</span></label>
-          <input data-caption placeholder="A line about what you are looking at">
-        </div>`;
-      return;
-    }
-
-    node.innerHTML = `
-      <p class="row-kicker">${spec.label}</p>
-      <div class="field">
-        <label>Heading <span class="opt">optional</span></label>
-        <input data-heading placeholder="${type === 'timeline' ? 'Timeline' : 'The idea'}">
-      </div>
-      <div class="field">
-        <label>${spec.field === 'text' ? 'Text' : 'One per line'}</label>
-        <p class="hint">${spec.blurb}${spec.example ? ` For example: ${spec.example}` : ''}</p>
-        <textarea data-value rows="${spec.field === 'text' ? 5 : 4}"></textarea>
-      </div>`;
-  });
-}
+const editorHost = el('editor');
+const editor = editorHost ? createEditor(editorHost, {
+  /* Images land in Storage the moment they are added, under this account's
+     own prefix — the same path explorations use, and the same one the server
+     checks against on submit. */
+  upload: async file => {
+    if (!state.user) throw new Error('sign in first');
+    return state.upload(file, state.user.uid);
+  },
+  onChange: () => schedulePreview(),
+}) : null;
 
 function addExploration() {
   const index = el('explorations').children.length + 1;
@@ -469,25 +427,7 @@ function collect() {
     categories: [...el('f-categories').querySelectorAll('input:checked')].map(i => i.value),
     status: el('f-status').value,
     summary: el('f-summary').value.trim(),
-    body: [...el('body-blocks').children].map(node => {
-      const type = node.dataset.blockType;
-      const spec = BODY_BLOCKS[type];
-      const heading = node.querySelector('[data-heading]').value.trim();
-      const block = { type };
-      if (heading) block.heading = heading;
-
-      if (type === 'image') {
-        const caption = node.querySelector('[data-caption]').value.trim();
-        if (caption) block.caption = caption;
-        block._media = node.querySelector('[data-image]').files[0];
-        return block;
-      }
-
-      const raw = node.querySelector('[data-value]').value;
-      if (spec.field === 'text') block.text = raw.trim();
-      else block[spec.field] = lines(raw);
-      return block;
-    }),
+    article: editor ? editor.html : '',
     explorations: [...el('explorations').children].map((node, index) => {
       const media = node.querySelector('[data-media]').files[0];
       const thumb = node.querySelector('[data-thumb]')?.files[0];
@@ -552,11 +492,12 @@ function check(concept) {
   if (!concept.categories.length) problems.push('Pick at least one category.');
   if (concept.categories.length > MAX.categories) problems.push(`At most ${MAX.categories} categories.`);
 
-  concept.body.forEach((block, index) => {
-    if (block.type === 'image' && !block._media) {
-      problems.push(`Section ${index + 1}: choose an image, or remove the section.`);
-    }
-  });
+  if (TEXT_FIRST.has(concept.type) && !articleText(concept.article)) {
+    problems.push(`A ${TYPES[concept.type]?.label ?? concept.type} concept needs the concept written out.`);
+  }
+  if (concept.article.length > MAX.article) {
+    problems.push('The concept is longer than the form accepts — trim it down.');
+  }
 
   concept.explorations.forEach((exploration, index) => {
     const where = `Exploration ${String(index + 1).padStart(2, '0')}`;
@@ -638,11 +579,6 @@ el('form').addEventListener('submit', async event => {
 
   try {
     setLabel('Uploading media…');
-    for (const block of concept.body) {
-      if (block.type !== 'image') continue;
-      block.media = (await state.upload(block._media, state.user.uid)).url;
-      delete block._media;
-    }
     for (const exploration of concept.explorations) {
       exploration.media = (await state.upload(exploration._media, state.user.uid)).url;
       if (exploration._thumb) {

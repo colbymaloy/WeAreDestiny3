@@ -24,6 +24,7 @@ import { fileURLToPath } from 'node:url';
 import {
   validateShape, slugify, SLUG_PATTERN, handleProblem, foldHandle,
 } from './model.mjs';
+import { sanitizeArticle, articleImages } from './sanitize.mjs';
 import {
   normalizeConcept, normalizeQuestion, linkGraph,
   sortConcepts, sortQuestions, projectStats,
@@ -91,6 +92,10 @@ export const submitConcept = onRequest(
     }
     concept.creator = handle;
 
+    /* Cleaned on the way in, so nothing downstream — the renderer, the JSON
+       feed, the preview — has to wonder whether this string is safe. */
+    if ('article' in concept) concept.article = sanitizeArticle(concept.article);
+
     concept.slug = slugify(concept.slug || concept.title || '');
     if (!SLUG_PATTERN.test(concept.slug)) {
       return response.status(400).json({ problems: ['That title does not produce a usable web address.'] });
@@ -156,9 +161,10 @@ function mediaBelongsTo(concept, uid) {
   for (const exploration of concept.explorations ?? []) {
     urls.push(exploration.media, exploration.thumbnail);
   }
-  /* Body images go through the same check as explorations. Miss this and the
-     image block becomes the one place a submission can point at someone
-     else's file. */
+  /* Images inside the article go through the same check as explorations. Miss
+     this and the editor becomes the one place a submission can point at
+     someone else's file. */
+  urls.push(...articleImages(concept.article));
   for (const block of concept.body ?? []) {
     if (block?.type === 'image') urls.push(block.media);
   }

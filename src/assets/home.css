@@ -240,7 +240,7 @@
   position: absolute;
   inset: 0;
   z-index: -2;
-  background: url("/media/hero/frontier.jpg?v=5") no-repeat 50% 50% / cover;
+  background: url("/media/hero/frontier.jpg?v=6") no-repeat 50% 50% / cover;
   opacity: .6;
   mix-blend-mode: screen;
   transition: transform 2s var(--l-ease);
@@ -761,7 +761,7 @@
   opacity: .12;
   mix-blend-mode: screen;
   pointer-events: none;
-  background: url("/media/concepts/c5.jpg?v=5") no-repeat 50% 50% / cover;
+  background: url("/media/concepts/c5.jpg?v=6") no-repeat 50% 50% / cover;
 }
 .home .cta-copy {
   position: relative;
@@ -780,7 +780,7 @@
   border: 1px solid rgba(255,255,255,.2);
   border-radius: 12px;
   box-shadow: 0 25px 50px -12px rgba(0,0,0,.5);
-  background: url("/media/concepts/c4.jpg?v=5") no-repeat 50% 45% / cover;
+  background: url("/media/concepts/c4.jpg?v=6") no-repeat 50% 45% / cover;
 }
 .home .cta-title { margin-bottom: 8px; font-size: 24px; color: #FFFFFF; }
 .home .cta-desc { max-width: 576px; font-size: 16px; color: var(--l-muted); }
@@ -1665,3 +1665,43 @@
   white-space: nowrap;
 }
 .donate:hover { background: color-mix(in srgb, var(--l-blue, #2563EB) 24%, transparent); color: #FFFFFF; }
+
+
+/* An article-shaped concept reads as one column, so the page gives it a
+   measure rather than the two-column split the block layout uses. */
+.ov-article { max-width: 74ch; }
+.ov-article .prose { font-size: 16px; line-height: 1.75; color: var(--l-ink-dim); }
+.ov-article .prose h2 { margin: 1.6em 0 .5em; font-size: 24px; font-weight: 700; color: var(--l-ink); }
+.ov-article .prose h3 { margin: 1.4em 0 .4em; font-size: 18px; font-weight: 600; color: var(--l-ink); }
+.ov-article .prose > :first-child { margin-top: 0; }
+.ov-article .prose p { margin: 0 0 1em; }
+.ov-article .prose ul, .ov-article .prose ol { margin: 0 0 1em; padding-left: 1.4em; }
+.ov-article .prose li { margin-bottom: .4em; }
+.ov-article .prose blockquote {
+  margin: 1.4em 0;
+  padding-left: 18px;
+  border-left: 2px solid var(--l-blue-hi);
+  color: var(--l-ink);
+}
+.ov-article .prose a { color: var(--l-blue-hi); text-decoration: underline; }
+.ov-article .prose figure { margin: 1.6em 0; }
+.ov-article .prose img {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--l-edge);
+  border-radius: 12px;
+}
+.ov-article .prose figcaption { margin-top: 8px; font-size: 13px; color: var(--l-muted); }
+.ov-article .prose code {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--l-panel);
+  font-size: .92em;
+}
+.ov-article .prose pre {
+  padding: 16px;
+  overflow-x: auto;
+  border: 1px solid var(--l-edge);
+  border-radius: 12px;
+  background: var(--l-panel);
+}

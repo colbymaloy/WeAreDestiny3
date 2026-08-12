@@ -889,19 +889,43 @@ function sbActivity(concept) {
    drifts from the page is worse than no preview, so both call one function. */
 
 export function renderOverview(concept, { question = null } = {}) {
+  const answering = question
+    ? `<p class="answering">Answering <a href="${question.url}">${escapeHtml(question.question)}</a></p>`
+    : '';
+
+  /* Newer concepts arrive as one article, written in the editor and cleaned
+     by the server before it was stored. Older ones are still the structured
+     blocks below, which is why both paths exist. */
+  if (concept.article) {
+    return `
+      <div class="ov" data-panel="overview">
+        <div class="ov-article">
+          <article class="prose">${concept.article}</article>
+          ${answering}
+        </div>
+        ${cxTakeaways(concept)}
+        ${cxExplorations(concept)}
+        <div class="cd-related">
+          ${cxReferences(concept)}
+          ${cxInspired(concept)}
+        </div>
+      </div>`;
+  }
+
   /* Two rows: the idea beside the flow that carries it, then the argument
      beside the takeaways. A concept without a flow block simply leaves the
      right half of the first row empty. */
-  const flow = concept.body.find(b => b.type === 'flow');
-  const lead = concept.body.find(b => b.type === 'prose');
-  const rest = concept.body.filter(b => b !== flow && b !== lead);
+  const body = concept.body ?? [];
+  const flow = body.find(b => b.type === 'flow');
+  const lead = body.find(b => b.type === 'prose');
+  const rest = body.filter(b => b !== flow && b !== lead);
 
   return `
       <div class="ov" data-panel="overview">
         <div class="ov-split">
           <div class="ov-col">
             ${lead ? cxOverviewBlock(lead) : ''}
-            ${question ? `<p class="answering">Answering <a href="${question.url}">${escapeHtml(question.question)}</a></p>` : ''}
+            ${answering}
           </div>
           <div class="ov-col">${flow ? cxOverviewBlock(flow) : ''}</div>
         </div>

@@ -1368,11 +1368,10 @@ export function renderLanding({ concepts, questions, stats, seed }) {
           >${esc(c.label)}</button>`).join('');
 
   return `
-<div class="home">
-  ${iconSprite()}
+${iconSprite()}
 
-  <!-- Hero -->
-  <section class="hhero">
+<!-- Hero — full bleed, so it sits outside the page container -->
+<section class="hhero">
     <span class="hhero-art" aria-hidden="true"></span>
     <span class="hhero-veil" aria-hidden="true"></span>
 
@@ -1391,7 +1390,9 @@ export function renderLanding({ concepts, questions, stats, seed }) {
         ${stat('compass', num(directions), 'Active directions')}
       </div>
     </div>
-  </section>
+</section>
+
+<div class="home">
 
   <!-- Category toolbar -->
   <nav class="toolbar" aria-label="Filter concepts">

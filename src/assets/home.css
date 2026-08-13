@@ -215,7 +215,7 @@
   width: 100%;
   max-width: 1600px;
   margin: 0 auto;
-  padding: 32px var(--l-gutter);
+  padding: 40px var(--l-gutter) 32px;
   display: flex;
   flex-direction: column;
   gap: 48px;
@@ -225,50 +225,69 @@
    Hero
    ------------------------------------------------------------- */
 
-.home .hhero {
+/* Full bleed: the artwork is the top of the page, not a card sitting on it.
+   The section lives outside .home so it spans the viewport without a
+   negative-margin trick fighting the container's max-width. */
+.hhero {
   position: relative;
   isolation: isolate;
   display: flex;
-  align-items: center;
-  min-height: 400px;
+  align-items: flex-end;
+  min-height: clamp(440px, 62vh, 640px);
   overflow: hidden;
-  border: 1px solid var(--l-edge);
-  border-radius: 16px;
   background: var(--l-bg);
 }
-.home .hhero-art {
+.hhero-art {
   position: absolute;
   inset: 0;
   z-index: -2;
-  background: url("/media/hero/frontier.jpg?v=8") no-repeat 50% 50% / cover;
-  opacity: .6;
-  mix-blend-mode: screen;
+  /* Two layers, so the new art can be dropped in without touching this file:
+     skyline.jpg covers frontier.jpg completely when it exists, and frontier
+     shows through until it does. */
+  background:
+    url("/media/hero/skyline.jpg?v=9") no-repeat 50% 45% / cover,
+    url("/media/hero/frontier.jpg?v=9") no-repeat 50% 45% / cover;
   transition: transform 2s var(--l-ease);
 }
-.home .hhero:hover .hhero-art { transform: scale(1.05); }
-.home .hhero-veil {
+.hhero:hover .hhero-art { transform: scale(1.04); }
+
+/* Three passes: darken the left so the words hold, sink the base into the
+   page so the artwork ends without a seam, and shade the top edge so the
+   header has something to sit against. */
+.hhero-veil {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(90deg, #080A0F 0%, rgba(8,10,15,.7) 50%, rgba(8,10,15,0) 100%);
+  background:
+    linear-gradient(90deg, var(--l-bg) 0%, rgba(8,10,15,.82) 32%, rgba(8,10,15,.18) 68%, rgba(8,10,15,0) 100%),
+    linear-gradient(0deg, var(--l-bg) 0%, rgba(8,10,15,.55) 14%, rgba(8,10,15,0) 46%),
+    linear-gradient(180deg, rgba(8,10,15,.5) 0%, rgba(8,10,15,0) 22%);
 }
 
-.home .hhero-inner { position: relative; padding: 40px; max-width: 672px; }
+/* The copy still lines up with the board below it. */
+.hhero-inner {
+  position: relative;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 56px var(--l-gutter) 52px;
+}
+.hhero-inner > * { max-width: 672px; }
 
-.home .hhero-title {
+.hhero .hhero-title {
   margin-bottom: 24px;
   font-size: clamp(36px, 4.4vw, 60px);
   font-weight: 700;
   line-height: 1.15;
   color: #FFFFFF;
 }
-.home .hhero-desc {
+.hhero .hhero-desc {
   margin-bottom: 40px;
   padding-right: 32px;
   font-size: 18px;
   color: var(--l-muted);
 }
-.home .hhero-actions {
+.hhero .hhero-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -276,14 +295,14 @@
   margin-bottom: 40px;
 }
 
-.home .hhero-stats {
+.hhero .hhero-stats {
   display: flex;
   align-items: center;
   gap: 40px;
   padding-top: 24px;
   border-top: 1px solid rgba(255,255,255,.1);
 }
-.home .hstat-value {
+.hhero .hstat-value {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -292,8 +311,8 @@
   font-weight: 500;
   color: #FFFFFF;
 }
-.home .hstat-value .ph { color: var(--l-blue); }
-.home .hstat-label {
+.hhero .hstat-value .ph { color: var(--l-blue); }
+.hhero .hstat-label {
   font-size: 12px;
   letter-spacing: .025em;
   text-transform: uppercase;
@@ -761,7 +780,7 @@
   opacity: .12;
   mix-blend-mode: screen;
   pointer-events: none;
-  background: url("/media/concepts/c5.jpg?v=8") no-repeat 50% 50% / cover;
+  background: url("/media/concepts/c5.jpg?v=9") no-repeat 50% 50% / cover;
 }
 .home .cta-copy {
   position: relative;
@@ -780,7 +799,7 @@
   border: 1px solid rgba(255,255,255,.2);
   border-radius: 12px;
   box-shadow: 0 25px 50px -12px rgba(0,0,0,.5);
-  background: url("/media/concepts/c4.jpg?v=8") no-repeat 50% 45% / cover;
+  background: url("/media/concepts/c4.jpg?v=9") no-repeat 50% 45% / cover;
 }
 .home .cta-title { margin-bottom: 8px; font-size: 24px; color: #FFFFFF; }
 .home .cta-desc { max-width: 576px; font-size: 16px; color: var(--l-muted); }
@@ -810,20 +829,20 @@
 @media (max-width: 1180px) { :is(.landing, .detail, .compose) .gsearch { width: 200px; } }
 @media (max-width: 1023px) { :is(.landing, .detail, .compose) .gnav { display: none; } }
 @media (max-width: 767px) {
-  .home .hhero-inner { padding: 28px 24px; }
-  .home .hhero-desc { padding-right: 0; font-size: 16px; }
-  .home .hhero-actions .hbtn { flex: 1 1 100%; justify-content: center; }
-  .home .hhero-stats { flex-wrap: wrap; gap: 20px 28px; }
+  .hhero .hhero-inner { padding: 34px var(--l-gutter) 32px; }
+  .hhero .hhero-desc { padding-right: 0; font-size: 16px; }
+  .hhero .hhero-actions .hbtn { flex: 1 1 100%; justify-content: center; }
+  .hhero .hhero-stats { flex-wrap: wrap; gap: 20px 28px; }
   .home .cta { padding: 24px; }
   .home .cta .hbtn { width: 100%; justify-content: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   :is(.landing, .detail, .compose) .rise { opacity: 1; transform: none; }
-  .home .hhero-art,
+  .hhero-art,
   .home .ccard-img,
   .home .bookmark { transition: none; }
-  .home .hhero:hover .hhero-art,
+  .hhero:hover .hhero-art,
   .home .ccard:hover .ccard-img,
   .home .ccard-lead .bookmark:hover { transform: none; }
 }

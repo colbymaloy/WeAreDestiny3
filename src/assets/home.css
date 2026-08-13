@@ -233,7 +233,10 @@
   isolation: isolate;
   display: flex;
   align-items: flex-end;
-  min-height: clamp(440px, 62vh, 640px);
+  /* A band, not a stage. The stand-in art is 1400px wide, so a tall hero
+     crops most of its height away and reads as a zoomed-in fragment. Raise
+     this once real hero art lands. */
+  min-height: clamp(340px, 44vh, 470px);
   overflow: hidden;
   background: var(--l-bg);
 }
@@ -245,8 +248,8 @@
      skyline.jpg covers frontier.jpg completely when it exists, and frontier
      shows through until it does. */
   background:
-    url("/media/hero/skyline.jpg?v=9") no-repeat 50% 45% / cover,
-    url("/media/hero/frontier.jpg?v=9") no-repeat 50% 45% / cover;
+    url("/media/hero/skyline.jpg?v=10") no-repeat 50% 45% / cover,
+    url("/media/hero/frontier.jpg?v=10") no-repeat 50% 38% / cover;
   transition: transform 2s var(--l-ease);
 }
 .hhero:hover .hhero-art { transform: scale(1.04); }
@@ -270,7 +273,7 @@
   width: 100%;
   max-width: 1600px;
   margin: 0 auto;
-  padding: 56px var(--l-gutter) 52px;
+  padding: 40px var(--l-gutter) 38px;
 }
 .hhero-inner > * { max-width: 672px; }
 
@@ -780,7 +783,7 @@
   opacity: .12;
   mix-blend-mode: screen;
   pointer-events: none;
-  background: url("/media/concepts/c5.jpg?v=9") no-repeat 50% 50% / cover;
+  background: url("/media/concepts/c5.jpg?v=10") no-repeat 50% 50% / cover;
 }
 .home .cta-copy {
   position: relative;
@@ -799,7 +802,7 @@
   border: 1px solid rgba(255,255,255,.2);
   border-radius: 12px;
   box-shadow: 0 25px 50px -12px rgba(0,0,0,.5);
-  background: url("/media/concepts/c4.jpg?v=9") no-repeat 50% 45% / cover;
+  background: url("/media/concepts/c4.jpg?v=10") no-repeat 50% 45% / cover;
 }
 .home .cta-title { margin-bottom: 8px; font-size: 24px; color: #FFFFFF; }
 .home .cta-desc { max-width: 576px; font-size: 16px; color: var(--l-muted); }

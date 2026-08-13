@@ -12,8 +12,8 @@ import {
 } from '/assets/model.mjs';
 import { renderOverview } from '/assets/render.mjs';
 import { iconSprite } from '/assets/icons.mjs';
-import { createEditor } from '/assets/editor.js?v=9';
-import { createConceptPicker } from '/assets/picker.js?v=9';
+import { createEditor } from '/assets/editor.js?v=10';
+import { createConceptPicker } from '/assets/picker.js?v=10';
 import { firebaseConfig, isConfigured } from '/assets/firebase-config.js';
 
 const el = id => document.getElementById(id);

@@ -1058,6 +1058,13 @@ body.landing { padding-top: 0; }
   text-transform: uppercase;
 }
 
+/* A page that is only reading matter sits in the middle of the window rather
+   than against the left edge. The lines stay left-aligned — it is the column
+   that centres, not the text inside it. */
+.page-centered .page-head,
+.page-centered .prose { margin-inline: auto; }
+.page-centered .page-head { max-width: var(--measure); }
+
 .prose { max-width: var(--measure); }
 .prose > * + * { margin-top: 1.1em; }
 .prose p, .prose li { color: var(--bone-dim); }
@@ -2596,3 +2603,186 @@ body.landing { padding-top: 0; }
   cursor: pointer;
 }
 .picker-clear:hover { color: var(--bone); border-color: var(--light); }
+
+/* =============================================================
+   Header, one treatment for every page
+
+   This used to live in home.css behind :is(.landing, .detail,
+   .compose), which meant the pages that do not load that file —
+   About, the question pages — wore an older nav. The rules moved
+   here, unscoped, so the bar is the same object everywhere. Last
+   in the file, so it wins over the block it replaces above.
+   ============================================================= */
+
+/* Icon marks. Sized off the font-size of whatever holds them. This lives here
+   rather than in home.css because the shared topbar uses it: without a size an
+   inline <svg> falls back to 300x150 and takes the brand apart. */
+.ph {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+}
+.ph-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+:root {
+  --nav-h:      65px;
+  --nav-pad:    24px;
+  --nav-edge:   rgba(255, 255, 255, .08);
+  --nav-blue:   #2563EB;
+  --nav-muted:  #94A3B8;
+  --nav-panel:  #0C0E14;
+  --nav-ease:   cubic-bezier(.16, 1, .3, 1);
+}
+@media (min-width: 1280px) { :root { --nav-pad: 48px; } }
+
+/* Sticky rather than fixed, so it takes its own room and no page has
+   to reserve height for it. */
+body { padding-top: 0; }
+
+.gheader {
+  position: sticky;
+  height: var(--nav-h);
+  gap: 40px;
+  padding: 0 var(--nav-pad);
+  background: rgba(8, 10, 15, .8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--nav-edge);
+  box-shadow: none;
+}
+/* The old violet edge and film grain are not part of this bar. */
+.gheader::before,
+.gheader::after { content: none; }
+
+.brand { min-width: 0; gap: 0; color: #FFFFFF; }
+.brand-glyph { display: none; }
+.brand-sub {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: .06em;
+  margin-bottom: 2px;
+  color: var(--nav-muted);
+  transition: color .18s var(--nav-ease);
+}
+.brand-name {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  font-stretch: normal;
+  letter-spacing: .08em;
+  color: #FFFFFF;
+}
+.brand-name em { color: inherit; }
+/* Blue and pointing down, as the mark is drawn in the design. */
+.brand-tri {
+  display: inline-block;
+  width: 15px; height: 15px;
+  margin-left: 6px;
+  vertical-align: -2px;
+  color: var(--nav-blue);
+  transition: color .18s var(--nav-ease);
+}
+.brand:hover .brand-sub { color: #FFFFFF; }
+.brand:hover .brand-tri { color: #FFFFFF; }
+
+.gnav {
+  margin-left: 0;
+  gap: 24px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.gnav a {
+  padding: 0 0 4px;
+  border-bottom: 2px solid transparent;
+  color: var(--nav-muted);
+  transition: color .18s var(--nav-ease);
+}
+.gnav a:hover { color: #FFFFFF; }
+.gheader .gnav a::after { content: none; }
+.gheader[data-nav="explore"]    [data-nav-id="explore"],
+.gheader[data-nav="concepts"]   [data-nav-id="concepts"],
+.gheader[data-nav="demos"]      [data-nav-id="demos"],
+.gheader[data-nav="questions"]  [data-nav-id="questions"],
+.gheader[data-nav="directions"] [data-nav-id="directions"],
+.gheader[data-nav="contribute"] [data-nav-id="contribute"],
+.gheader[data-nav="about"]      [data-nav-id="about"] {
+  color: #FFFFFF;
+  border-bottom-color: var(--nav-blue);
+}
+
+.gtools { gap: 20px; }
+.gtools-sep { display: none; }
+
+.gsearch {
+  width: 256px;
+  height: 33px;
+  gap: 8px;
+  padding: 0 16px 0 12px;
+  border-radius: 999px;
+  border-color: var(--nav-edge);
+  background: var(--nav-panel);
+  color: var(--nav-muted);
+  transition: border-color .18s var(--nav-ease);
+}
+.gsearch:focus-within { border-color: rgba(37, 99, 235, .5); }
+.gsearch input { font-family: inherit; font-size: 14px; color: #FFFFFF; }
+.gsearch input::placeholder { color: var(--nav-muted); }
+.gsearch kbd { display: none; }
+
+.gicon {
+  position: relative;
+  width: auto;
+  height: auto;
+  color: var(--nav-muted);
+}
+.gicon:hover { color: #FFFFFF; background: none; }
+.gicon .i { width: 20px; height: 20px; }
+.gdot {
+  display: block;
+  position: absolute;
+  top: -2px; right: -2px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--nav-blue);
+}
+
+.guser .i { display: none; }
+.guser-avatar {
+  width: 36px; height: 36px;
+  border-color: var(--nav-edge);
+  background: linear-gradient(to top right, #3B82F6, #A855F7);
+  transition: border-color .18s var(--nav-ease);
+}
+.guser:hover .guser-avatar { border-color: rgba(255,255,255,.4); }
+
+@media (max-width: 1180px) { .gsearch { width: 200px; } }
+@media (max-width: 1023px) { .gnav { display: none; } }
+
+/* Contact, beside the hosting link in the footer. Defined here rather than in
+   home.css so the pages that do not load that file still get the button. */
+.foot-contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .04);
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: border-color .18s var(--nav-ease), background .18s var(--nav-ease);
+}
+.foot-contact svg { width: 15px; height: 15px; }
+.foot-contact:hover {
+  border-color: rgba(255, 255, 255, .3);
+  background: rgba(255, 255, 255, .08);
+  color: #FFFFFF;
+}

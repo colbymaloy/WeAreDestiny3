@@ -84,142 +84,15 @@
 }
 
 /* -------------------------------------------------------------
-   Header — sticky glass over the page, not over the hero
+   Header
+
+   The bar itself is styled once, globally, in site.css — every page
+   wears the same one. Only the page-level consequence stays here.
    ------------------------------------------------------------- */
 
-:is(.landing, .detail, .compose) .gheader {
-  position: sticky;
-  height: var(--l-header);
-  gap: 40px;
-  padding: 0 var(--l-gutter);
-  background: rgba(8, 10, 15, .8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--l-edge);
-  box-shadow: none;
-}
-:is(.landing, .detail, .compose) .gheader::before,
-:is(.landing, .detail, .compose) .gheader::after { content: none; }
-
-:is(.landing, .detail, .compose) .brand { min-width: 0; gap: 0; color: #FFFFFF; }
-:is(.landing, .detail, .compose) .brand-glyph { display: none; }
-:is(.landing, .detail, .compose) .brand-sub {
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 400;
-  letter-spacing: .06em;
-  margin-bottom: 2px;
-  color: var(--l-muted);
-  transition: color .18s var(--l-ease);
-}
-:is(.landing, .detail, .compose) .brand-name {
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  font-stretch: normal;
-  letter-spacing: .08em;
-  color: #FFFFFF;
-}
-:is(.landing, .detail, .compose) .brand-name em { color: inherit; }
-:is(.landing, .detail, .compose) .brand-tri {
-  display: inline-block;
-  font-size: 18px;
-  margin-left: 5px;
-  vertical-align: -3px;
-  transition: color .18s var(--l-ease);
-}
-:is(.landing, .detail, .compose) .brand:hover .brand-sub { color: #FFFFFF; }
-:is(.landing, .detail, .compose) .brand:hover .brand-tri { color: var(--l-blue); }
-
-:is(.landing, .detail, .compose) .gnav {
-  margin-left: 0;
-  gap: 24px;
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: normal;
-  text-transform: none;
-}
-:is(.landing, .detail, .compose) .gnav a {
-  padding: 0 0 4px;
-  border-bottom: 2px solid transparent;
-  color: var(--l-muted);
-  transition: color .18s var(--l-ease);
-}
-:is(.landing, .detail, .compose) .gnav a:hover { color: #FFFFFF; }
-:is(.landing, .detail, .compose) .gheader .gnav a::after { content: none; }
-:is(.landing, .detail, .compose) .gheader[data-nav="explore"] [data-nav-id="explore"],
-:is(.landing, .detail, .compose) .gheader[data-nav="concepts"] [data-nav-id="concepts"],
-:is(.landing, .detail, .compose) .gheader[data-nav="demos"] [data-nav-id="demos"],
-:is(.landing, .detail, .compose) .gheader[data-nav="questions"] [data-nav-id="questions"],
-:is(.landing, .detail, .compose) .gheader[data-nav="directions"] [data-nav-id="directions"],
-:is(.landing, .detail, .compose) .gheader[data-nav="about"] [data-nav-id="about"] {
-  color: #FFFFFF;
-  border-bottom-color: var(--l-blue);
-}
-
-/* The header scrolls with the page here, so nothing needs clearing.
+/* The header scrolls with the page, so nothing needs clearing.
    site.css already owns .concept, so the body class is .detail. */
 .detail { padding: 0; }
-
-:is(.landing, .detail, .compose) .gtools { gap: 20px; }
-:is(.landing, .detail, .compose) .gtools-sep { display: none; }
-
-:is(.landing, .detail, .compose) .gsearch {
-  width: 256px;
-  height: 33px;
-  gap: 8px;
-  padding: 0 16px 0 12px;
-  border-radius: 999px;
-  border-color: var(--l-edge);
-  background: var(--l-panel);
-  color: var(--l-muted);
-  transition: border-color .18s var(--l-ease);
-}
-:is(.landing, .detail, .compose) .gsearch:focus-within { border-color: rgba(37, 99, 235, .5); }
-:is(.landing, .detail, .compose) .gsearch input { font-family: inherit; font-size: 14px; color: #FFFFFF; }
-:is(.landing, .detail, .compose) .gsearch input::placeholder { color: var(--l-muted); }
-:is(.landing, .detail, .compose) .gsearch kbd { display: none; }
-
-:is(.landing, .detail, .compose) .gicon {
-  position: relative;
-  width: auto;
-  height: auto;
-  color: var(--l-muted);
-}
-:is(.landing, .detail, .compose) .gicon:hover { color: #FFFFFF; background: none; }
-:is(.landing, .detail, .compose) .gicon .i { width: 20px; height: 20px; }
-:is(.landing, .detail, .compose) .gdot {
-  display: block;
-  position: absolute;
-  top: -2px; right: -2px;
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--l-blue);
-}
-
-:is(.landing, .detail, .compose) .guser .i { display: none; }
-:is(.landing, .detail, .compose) .guser-avatar {
-  width: 36px; height: 36px;
-  border-color: var(--l-edge);
-  background: linear-gradient(to top right, #3B82F6, #A855F7);
-  transition: border-color .18s var(--l-ease);
-}
-:is(.landing, .detail, .compose) .guser:hover .guser-avatar { border-color: rgba(255,255,255,.4); }
-
-/* -------------------------------------------------------------
-   Page frame
-   ------------------------------------------------------------- */
-
-.home {
-  width: 100%;
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 40px var(--l-gutter) 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 48px;
-}
 
 /* -------------------------------------------------------------
    Hero
@@ -228,54 +101,72 @@
 /* Full bleed: the artwork is the top of the page, not a card sitting on it.
    The section lives outside .home so it spans the viewport without a
    negative-margin trick fighting the container's max-width. */
+/* The copy sets the height and the artwork fills whatever that comes to. Sizing
+   it the other way round — off the image's 2.33:1 ratio — left a band of unused
+   picture below the words that grew with the viewport. */
 .hhero {
   position: relative;
   isolation: isolate;
-  display: flex;
-  align-items: flex-end;
-  /* A band, not a stage. The stand-in art is 1400px wide, so a tall hero
-     crops most of its height away and reads as a zoomed-in fragment. Raise
-     this once real hero art lands. */
-  min-height: clamp(340px, 44vh, 470px);
   overflow: hidden;
+  /* Behind the art: what shows if the artwork is missing. */
   background: var(--l-bg);
 }
+
+/* Out of flow, so it contributes nothing to the height. `cover` keeps the frame
+   filled at any shape; the city, spire and figures sit low in the source, which
+   is what 58% holds in view as the crop tightens. */
 .hhero-art {
   position: absolute;
   inset: 0;
-  z-index: -2;
-  /* Two layers, so the new art can be dropped in without touching this file:
-     skyline.jpg covers frontier.jpg completely when it exists, and frontier
-     shows through until it does. */
-  background:
-    url("/media/hero/skyline.jpg?v=10") no-repeat 50% 45% / cover,
-    url("/media/hero/frontier.jpg?v=10") no-repeat 50% 38% / cover;
-  transition: transform 2s var(--l-ease);
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 58%;
 }
-.hhero:hover .hhero-art { transform: scale(1.04); }
 
-/* Three passes: darken the left so the words hold, sink the base into the
-   page so the artwork ends without a seam, and shade the top edge so the
-   header has something to sit against. */
+/* Darken the left so the words hold, and sink the base into the page so the
+   artwork ends without a seam. */
 .hhero-veil {
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 1;
   background:
-    linear-gradient(90deg, var(--l-bg) 0%, rgba(8,10,15,.82) 32%, rgba(8,10,15,.18) 68%, rgba(8,10,15,0) 100%),
-    linear-gradient(0deg, var(--l-bg) 0%, rgba(8,10,15,.55) 14%, rgba(8,10,15,0) 46%),
-    linear-gradient(180deg, rgba(8,10,15,.5) 0%, rgba(8,10,15,0) 22%);
+    linear-gradient(90deg, rgba(8,10,15,.92) 0%, rgba(8,10,15,.72) 30%, rgba(8,10,15,.14) 64%, rgba(8,10,15,0) 100%),
+    linear-gradient(0deg, var(--l-bg) 0%, rgba(8,10,15,.6) 12%, rgba(8,10,15,0) 40%),
+    linear-gradient(180deg, rgba(8,10,15,.5) 0%, rgba(8,10,15,0) 20%);
 }
 
-/* The copy still lines up with the board below it. */
+/* The only thing in flow, so its padding is the hero's height. The headline
+   starts a fixed distance under the nav no matter how wide the window gets. */
 .hhero-inner {
   position: relative;
+  z-index: 2;
   width: 100%;
   max-width: 1600px;
   margin: 0 auto;
-  padding: 40px var(--l-gutter) 38px;
+  padding: 52px var(--l-gutter) 64px;
 }
 .hhero-inner > * { max-width: 672px; }
+
+/* Narrow screens: filling a portrait-ish box with a 2.33:1 frame would crop it
+   down to a sliver, so the two stack instead — the artwork at its own ratio,
+   the words following it on the page's own background. */
+@media (max-width: 900px) {
+  .hhero { overflow: visible; }
+  .hhero-art {
+    position: static;
+    height: auto;
+    aspect-ratio: 1916 / 821;
+  }
+  .hhero-veil {
+    /* Only the base fade is left, to sink the artwork into the copy below. */
+    inset: 0 0 auto;
+    aspect-ratio: 1916 / 821;
+    background: linear-gradient(0deg, var(--l-bg) 0%, rgba(8,10,15,.35) 22%, rgba(8,10,15,0) 55%);
+  }
+  .hhero-inner { padding-top: 28px; }
+}
 
 .hhero .hhero-title {
   margin-bottom: 24px;
@@ -350,6 +241,21 @@
 }
 :is(.landing, .detail, .compose) .hbtn-ghost:hover { background: var(--l-panel); }
 :is(.landing, .detail, .compose) .hbtn-lg { padding: 16px 32px; }
+
+/* -------------------------------------------------------------
+   Board column
+
+   The hero's copy sits in a 1600px column; the board below it used to
+   run the full width of the window, so the two did not line up on a
+   wide screen. Same measure, same gutter.
+   ------------------------------------------------------------- */
+
+.home {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 var(--l-gutter);
+}
 
 /* -------------------------------------------------------------
    Category toolbar
@@ -783,7 +689,7 @@
   opacity: .12;
   mix-blend-mode: screen;
   pointer-events: none;
-  background: url("/media/concepts/c5.jpg?v=10") no-repeat 50% 50% / cover;
+  background: url("/media/concepts/c5.jpg?v=13") no-repeat 50% 50% / cover;
 }
 .home .cta-copy {
   position: relative;
@@ -802,7 +708,7 @@
   border: 1px solid rgba(255,255,255,.2);
   border-radius: 12px;
   box-shadow: 0 25px 50px -12px rgba(0,0,0,.5);
-  background: url("/media/concepts/c4.jpg?v=10") no-repeat 50% 45% / cover;
+  background: url("/media/concepts/c4.jpg?v=13") no-repeat 50% 45% / cover;
 }
 .home .cta-title { margin-bottom: 8px; font-size: 24px; color: #FFFFFF; }
 .home .cta-desc { max-width: 576px; font-size: 16px; color: var(--l-muted); }
@@ -992,10 +898,16 @@
    Player
    ------------------------------------------------------------- */
 
+/* The frame takes the media's own shape rather than forcing 16:9 onto it, so a
+   phone-shot vertical video plays tall instead of being cropped to a letterbox
+   slot. `--arw` is width ÷ height, set by concept.js once the real dimensions
+   are known; 16:9 until then. */
 .vp {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  --arw: 1.7778;
+  aspect-ratio: var(--arw);
+  margin-inline: auto;
   overflow: hidden;
   border: 1px solid var(--l-edge);
   border-radius: 12px;
@@ -1006,12 +918,25 @@
 .vp video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  /* The box already matches, so this only guards a poster whose dimensions
+     differ slightly from the video it stands for. */
+  object-fit: contain;
   opacity: .8;
   transition: opacity .7s var(--l-ease);
 }
 .vp:hover img,
 .vp:hover video { opacity: 1; }
+
+/* Only a portrait clip needs holding back — at full width a 9:16 frame would
+   be twice the height of the window. Landscape keeps the width it always had.
+   The max-width is what preserves the ratio while the height is capped. */
+.vp-tall { max-width: calc(78vh * var(--arw)); }
+
+/* A YouTube cover is a poster until it is clicked, so the whole frame is the
+   target; once the embed swaps in it fills the box and owns its own controls. */
+.vp-yt { cursor: pointer; }
+.vp-yt img { opacity: 1; }
+.vp-yt iframe { width: 100%; height: 100%; border: 0; }
 
 .vp-play {
   position: absolute;
@@ -1308,7 +1233,9 @@
   background: var(--l-panel-hi);
   cursor: pointer;
 }
-.xc-media img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s var(--l-ease); }
+/* Tiles stay a uniform grid, but the whole frame shows inside one — a vertical
+   exploration is shown small rather than cropped down the middle. */
+.xc-media img { width: 100%; height: 100%; object-fit: contain; transition: transform .5s var(--l-ease); }
 .xc:hover .xc-media img { transform: scale(1.05); }
 .xc-scrim {
   position: absolute;
@@ -1464,10 +1391,6 @@
 .sb-rows dt { color: var(--l-muted); }
 .sb-rows dd { margin: 0; color: var(--l-ink); }
 
-.mat { margin-top: 20px; }
-.mat-head { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px; color: var(--l-muted); }
-.mat-track { height: 4px; overflow: hidden; border-radius: 999px; background: var(--l-bg); }
-.mat-track span { display: block; height: 100%; border-radius: 999px; background: var(--l-blue-hi); }
 
 .cr { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
 .cd .avatar {
@@ -1797,6 +1720,7 @@
 .compose input[type="text"],
 .compose input:not([type]),
 .compose input[type="search"],
+.compose input[type="url"],
 .compose textarea,
 .compose select {
   width: 100%;
@@ -1820,6 +1744,15 @@
   padding: 8px;
   font-size: 13px;
   color: var(--l-muted);
+}
+/* The header's search is not one of the form's fields — the rules above catch
+   it by type and would draw a second box inside the pill. */
+.compose .gsearch input {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  font-size: 14px;
 }
 
 .sel { position: relative; }
@@ -1954,6 +1887,10 @@
 .panel-title { margin-bottom: 14px; font-size: 14px; font-weight: 600; color: #FFFFFF; }
 .panel-opt { font-weight: 400; color: var(--l-dark); }
 .panel-note { margin: 12px 0 0; font-size: 11px; line-height: 1.6; color: var(--l-dark); }
+
+/* The second way to give a concept a cover, under the drop zone it replaces. */
+.cover-yt { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--l-edge); }
+.cover-yt .fld-hint { margin: 6px 0 0; }
 
 .drop {
   display: flex;

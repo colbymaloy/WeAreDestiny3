@@ -300,7 +300,7 @@ export function validateShape(concept, { requireSlug = true } = {}) {
       fail(`"cover" is "${cover}", which is not an exploration id in this concept`);
     }
   } else if (cover && typeof cover === 'object') {
-    problems.push(...mediaProblems(cover, 'cover'));
+    problems.push(...mediaProblems(cover, 'cover', { allowYoutube: true }));
   } else if (cover != null) {
     fail('"cover" must be an exploration id, or { type, media, thumbnail }, or omitted');
   }
@@ -380,16 +380,37 @@ export function validateShape(concept, { requireSlug = true } = {}) {
 export const articleText = article =>
   String(article ?? '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 
-export function mediaProblems(item, where) {
+/** The eleven-character id out of any URL YouTube hands out, else null. */
+export function youtubeId(url) {
+  const match = String(url ?? '').match(
+    /(?:youtube(?:-nocookie)?\.com\/(?:watch\?(?:[^#]*&)?v=|embed\/|shorts\/|live\/|v\/)|youtu\.be\/)([\w-]{11})/,
+  );
+  return match ? match[1] : null;
+}
+
+/** YouTube's own still for a video. Every upload has one. */
+export const youtubePoster = id => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+
+/* A YouTube cover is a link, not an upload, so it costs the project nothing to
+   store or serve. Only the cover takes one — explorations render as plain
+   <img>/<video>, which an embed cannot stand in for. */
+export function mediaProblems(item, where, { allowYoutube = false } = {}) {
   const problems = [];
-  if (item.type !== 'image' && item.type !== 'video') {
-    problems.push(`${where}: "type" must be "image" or "video"`);
+  const kinds = allowYoutube ? ['image', 'video', 'youtube'] : ['image', 'video'];
+
+  if (!kinds.includes(item.type)) {
+    problems.push(`${where}: "type" must be ${kinds.map(k => `"${k}"`).join(' or ')}`);
   }
   if (typeof item.media !== 'string' || !item.media.trim()) {
     problems.push(`${where}: "media" is required`);
+  } else if (item.type === 'youtube') {
+    if (!youtubeId(item.media)) {
+      problems.push(`${where}: "media" must be a YouTube video URL`);
+    }
   } else if (!/^https?:\/\//i.test(item.media) && !item.media.startsWith('/')) {
     problems.push(`${where}: "media" must be a full URL or a site-root path starting with "/"`);
   }
+  /* YouTube supplies its own still, so only an uploaded video has to carry one. */
   if (item.type === 'video' && !item.thumbnail) {
     problems.push(`${where}: video needs a "thumbnail" so the board has something to show`);
   }

@@ -122,7 +122,7 @@ function localToggle(button, key, onLabel, offLabel) {
   });
 }
 
-localToggle(document.querySelector('[data-follow]'), 'wad3:following', 'Following', 'Follow');
+localToggle(document.querySelector('[data-follow]'), 'wad3:following', 'Following concept', 'Follow concept');
 localToggle(document.querySelector('[data-save]'), 'wad3:saved', 'Bookmarked', 'Bookmark');
 
 document.querySelector('[data-share]')?.addEventListener('click', async () => {
@@ -152,10 +152,54 @@ if (rising.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
   }
 }
 
+/* --- YouTube cover --------------------------------------------------------- */
+
+/* The still is a facade. Nothing of YouTube's is fetched until a reader asks
+   for the video, and then the embed replaces the poster and plays. */
+const yt = document.querySelector('.vp-yt');
+
+yt?.addEventListener('click', () => {
+  const id = yt.dataset.youtube;
+  if (!id || yt.querySelector('iframe')) return;
+
+  const frame = document.createElement('iframe');
+  frame.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0`;
+  frame.title = document.querySelector('.cd-title')?.textContent ?? 'Video';
+  frame.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen';
+  frame.allowFullscreen = true;
+  frame.referrerPolicy = 'strict-origin-when-cross-origin';
+
+  yt.replaceChildren(frame);
+});
+
 /* --- video ---------------------------------------------------------------- */
 
-const player = document.querySelector('.vp');
+const player = document.querySelector('.vp:not(.vp-yt)');
 const video = player?.querySelector('video');
+
+/* Give the frame the media's real shape. The server has no idea how tall an
+   upload is, so the box starts at 16:9 and corrects itself the moment the
+   browser knows better — otherwise a vertical video sits cropped inside a
+   landscape slot. */
+if (player) {
+  const fit = (w, h) => {
+    if (!(w > 0 && h > 0)) return;
+    player.style.setProperty('--arw', String(w / h));
+    /* Taller than wide: cap the height so the player still fits the window. */
+    player.classList.toggle('vp-tall', h > w);
+  };
+  const poster = player.querySelector('img');
+
+  video?.addEventListener('loadedmetadata', () => fit(video.videoWidth, video.videoHeight));
+  if (video?.videoWidth) fit(video.videoWidth, video.videoHeight);
+
+  if (poster) {
+    /* The poster is the first frame of that same video, so it carries the
+       shape before any of the video itself has been fetched. */
+    const measure = () => fit(poster.naturalWidth, poster.naturalHeight);
+    poster.complete ? measure() : poster.addEventListener('load', measure, { once: true });
+  }
+}
 
 if (player && video) {
   const bar = player.querySelector('[data-vp="track"]');

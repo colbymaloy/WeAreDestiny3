@@ -7,7 +7,7 @@
  */
 
 import {
-  TYPES, CATEGORY_LABEL, STATUSES, RELATIONS, CATEGORIES,
+  TYPES, CATEGORY_LABEL, STATUSES, RELATIONS, CATEGORIES, youtubeId, youtubePoster,
 } from './model.mjs';
 import { iconSprite, ph } from './icons.mjs';
 
@@ -15,6 +15,23 @@ export const SITE = 'https://wearedestiny3.com';
 export const REPO = 'https://github.com/colbymaloy/WeAreDestiny3';
 export const DEFAULT_IMAGE = `${SITE}/media/branding/social-card.jpg`;
 
+
+/* The still that stands for a cover anywhere it is shown small: a card, a
+   related strip, a social image. An uploaded video carries its own; a YouTube
+   cover borrows YouTube's; an image is its own poster. Written concepts have
+   none, and the callers fall back to an editorial face. */
+function coverPoster(cover) {
+  if (!cover) return '';
+  if (cover.thumbnail) return cover.thumbnail;
+  if (cover.type === 'youtube') {
+    const id = youtubeId(cover.media);
+    return id ? youtubePoster(id) : '';
+  }
+  return cover.type === 'image' ? cover.media : '';
+}
+
+/* Both kinds of moving picture read as "Video" on a card. */
+const isMoving = cover => cover?.type === 'video' || cover?.type === 'youtube';
 
 /* A mark per concept type. Text concepts have no cover image, so the glyph
    carries the visual weight instead of a missing thumbnail. */
@@ -39,8 +56,10 @@ function fill(template, values) {
   ));
 }
 
-/** Resolve <!--INCLUDE:file.html KEY=value ...--> against a partials map. */
-export function resolveIncludes(html, partials) {
+/** Resolve <!--INCLUDE:file.html KEY=value ...--> against a partials map.
+    `jsonLd` is a ready-made <script> block for the page's structured data;
+    pages that have none get the site-level block in head.html and nothing more. */
+export function resolveIncludes(html, partials, jsonLd = '') {
   return html.replace(/<!--INCLUDE:([\w.-]*?\.html)([\s\S]*?)-->/g, (match, file, body) => {
     const partial = partials[file] ?? '';
     const values = {};
@@ -50,7 +69,11 @@ export function resolveIncludes(html, partials) {
     }
     if (!values.IMAGE) values.IMAGE = DEFAULT_IMAGE;
     if (!values.OG_TITLE) values.OG_TITLE = values.TITLE ?? '';
+    if (!values.OG_TYPE) values.OG_TYPE = 'website';
     for (const key of Object.keys(values)) values[key] = escapeHtml(values[key]);
+    /* Structured data arrives already built and already escaped — running it
+       through escapeHtml would turn the JSON into entities. */
+    values.JSON_LD = jsonLd ?? '';
     return fill(partial, values).trim();
   });
 }
@@ -91,9 +114,7 @@ function mediaAttrs({ type, media, thumbnail, title, sub, t }) {
 /* --- board ---------------------------------------------------------------- */
 
 function renderCard(concept, { featured = false } = {}) {
-  const poster = concept.cover
-    ? concept.cover.thumbnail || (concept.cover.type === 'image' ? concept.cover.media : '')
-    : '';
+  const poster = coverPoster(concept.cover);
   const count = concept.explorations.length;
   const cited = concept.citedBy.length;
 
@@ -101,7 +122,7 @@ function renderCard(concept, { featured = false } = {}) {
   const face = poster
     ? `<div class="card-media">
          <img src="${escapeHtml(poster)}" alt="" loading="lazy" decoding="async">
-         ${concept.cover.type === 'video' ? '<span class="card-flag">Video</span>' : ''}
+         ${isMoving(concept.cover) ? '<span class="card-flag">Video</span>' : ''}
        </div>`
     : `<div class="editorial">
          ${glyph(concept.type, 'editorial-glyph')}
@@ -270,9 +291,7 @@ function renderBlock(block, index) {
 
 /** A cited concept, shown as a compact card with the citer's reason. */
 function renderRefCard(concept, note) {
-  const poster = concept.cover
-    ? concept.cover.thumbnail || (concept.cover.type === 'image' ? concept.cover.media : '')
-    : '';
+  const poster = coverPoster(concept.cover);
   const face = poster
     ? `<img src="${escapeHtml(poster)}" alt="" loading="lazy" decoding="async">`
     : glyph(concept.type, 'ref-glyph');
@@ -602,8 +621,10 @@ function cxHeader(concept) {
 
     <div class="cd-actions">
       <div class="follow">
+        <!-- Names its object: the button sits under the title, where "Follow"
+             alone reads as though it might mean the person who posted. -->
         <button type="button" class="follow-b" data-follow aria-pressed="false">
-          ${ph('user-plus')}<span data-follow-label>Follow</span>
+          ${ph('user-plus')}<span data-follow-label>Follow concept</span>
         </button>
         <span class="follow-count" data-follow-count>${compact(concept.followers ?? 0)}</span>
       </div>
@@ -611,7 +632,6 @@ function cxHeader(concept) {
         ${ph('bookmark-simple')}${ph('bookmark-simple', 'fill')}<span data-save-label>Bookmark</span>
       </button>
       <button type="button" class="sq" data-share>${ph('share-network')}Share</button>
-      <button type="button" class="sq sq-icon" aria-label="More">${ph('dots-three')}</button>
     </div>
   </header>`;
 }
@@ -619,8 +639,21 @@ function cxHeader(concept) {
 function cxPlayer(concept) {
   const cover = concept.cover;
   if (!cover) return '';
-  const poster = cover.thumbnail || cover.media;
+  const poster = coverPoster(cover) || cover.media;
   const isVideo = cover.type === 'video';
+  const ytId = cover.type === 'youtube' ? youtubeId(cover.media) : null;
+
+  /* A YouTube cover renders as its own still until it is clicked, and only then
+     loads the embed. That keeps the page free of YouTube's script and cookies
+     for every reader who never presses play, and the embed brings its own
+     controls, so the bar below is left off. */
+  if (ytId) {
+    return `
+  <div class="vp vp-yt" data-youtube="${escapeHtml(ytId)}">
+    <img src="${escapeHtml(poster)}" alt="${escapeHtml(concept.title)}">
+    <button type="button" class="vp-play" aria-label="Play on YouTube">${ph('play', 'fill')}</button>
+  </div>`;
+  }
 
   return `
   <div class="vp" data-video="${isVideo ? escapeHtml(cover.media) : ''}">
@@ -759,7 +792,7 @@ function cxReferences(concept) {
       const t = c.target;
       const e = c.explorationRef;
       const poster = (e && (e.thumbnail || (e.type === 'image' ? e.media : '')))
-        || (t.cover && (t.cover.thumbnail || (t.cover.type === 'image' ? t.cover.media : '')));
+        || coverPoster(t.cover);
       return `
       <li>
         <a class="rel-row" href="${t.url}">
@@ -791,7 +824,7 @@ function cxInspired(concept) {
     </div>
     <ul class="rel-list">${shown.map(entry => {
       const c = entry.source;
-      const poster = c.cover && (c.cover.thumbnail || (c.cover.type === 'image' ? c.cover.media : ''));
+      const poster = coverPoster(c.cover);
       return `
       <li>
         <a class="rel-row" href="${c.url}">
@@ -814,12 +847,7 @@ function cxInspired(concept) {
 
 /* --- sidebar --------------------------------------------------------------- */
 
-/* How far along a concept is, restated from its status as a single bar.
-   Nothing new is claimed here — the number tracks the badge above it. */
-const MATURITY = { exploring: 35, direction: 70, refined: 100 };
-
 function sbStatus(concept) {
-  const pct = MATURITY[concept.status] ?? 35;
   const rows = [
     concept.date ? ['Created', prettyDate(concept.date)] : null,
     concept.updated ? ['Last updated', prettyDate(concept.updated)] : null,
@@ -832,10 +860,6 @@ function sbStatus(concept) {
     <span class="pill pill-${escapeHtml(concept.status)}">${escapeHtml(STATUSES[concept.status])}</span>
     <dl class="sb-rows">${rows.map(([term, value]) => `
       <div><dt>${escapeHtml(term)}</dt><dd>${value}</dd></div>`).join('')}</dl>
-    <div class="mat">
-      <div class="mat-head"><span>Maturity</span><span>${pct}%</span></div>
-      <div class="mat-track"><span style="width:${pct}%"></span></div>
-    </div>
   </section>`;
 }
 
@@ -1005,15 +1029,41 @@ export function renderConceptPage(concept, {
   </div>
 </main>`;
 
+  const cover = image ? (image.startsWith('/') ? SITE + image : image) : DEFAULT_IMAGE;
+
   const html = fill(template, {
     TITLE: escapeHtml(concept.title),
     DESCRIPTION: escapeHtml(concept.summary),
     PATH: concept.url,
-    IMAGE: image ? escapeHtml(image.startsWith('/') ? SITE + image : image) : DEFAULT_IMAGE,
+    IMAGE: escapeHtml(cover),
     CONCEPT: body,
   });
 
-  return resolveIncludes(html, partials);
+  return resolveIncludes(html, partials, jsonLdBlock({
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: concept.title,
+    headline: concept.title,
+    description: concept.summary,
+    url: SITE + concept.url,
+    image: cover,
+    ...(concept.date ? { datePublished: String(concept.date).slice(0, 10) } : {}),
+    author: { '@type': 'Person', name: concept.creator },
+    creator: { '@type': 'Person', name: concept.creator },
+    genre: concept.categories.map(c => CATEGORY_LABEL[c]).filter(Boolean),
+    isPartOf: { '@type': 'WebSite', name: 'WE ARE DESTINY 3', url: `${SITE}/` },
+    /* Fan work about someone else's property — saying so in the data as well
+       as in the footer. */
+    isAccessibleForFree: true,
+    about: { '@type': 'VideoGame', name: 'Destiny' },
+  }));
+}
+
+/* A <script> block, with the one sequence that could close it early neutered.
+   JSON has no way to express `</script>`, so escaping the slash is safe. */
+function jsonLdBlock(data) {
+  const json = JSON.stringify(data).replace(/<\//g, '<\\/');
+  return `<script type="application/ld+json">\n${json}\n</script>`;
 }
 
 /* --- question page -------------------------------------------------------- */
@@ -1101,8 +1151,7 @@ export const avatar = ([a, b] = ['#3C2A6E', '#1B1230']) =>
    renderer below never needs to know which it is looking at. */
 
 function fromConcept(concept) {
-  const cover = concept.cover;
-  const thumb = cover ? (cover.thumbnail || (cover.type === 'image' ? cover.media : '')) : '';
+  const thumb = coverPoster(concept.cover);
   const categories = concept.categories.map(c => CATEGORY_LABEL[c]).filter(Boolean);
 
   return {
@@ -1372,7 +1421,7 @@ ${iconSprite()}
 
 <!-- Hero — full bleed, so it sits outside the page container -->
 <section class="hhero">
-    <span class="hhero-art" aria-hidden="true"></span>
+    <img class="hhero-art" src="/media/hero/skyline.jpg?v=13" alt="" width="1916" height="821" fetchpriority="high" decoding="async">
     <span class="hhero-veil" aria-hidden="true"></span>
 
     <div class="hhero-inner">

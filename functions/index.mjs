@@ -22,7 +22,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
-  validateShape, slugify, SLUG_PATTERN, handleProblem, foldHandle,
+  validateShape, slugify, SLUG_PATTERN, handleProblem, foldHandle, youtubeId, youtubePoster,
 } from './model.mjs';
 import { sanitizeArticle, articleImages } from './sanitize.mjs';
 import {
@@ -30,7 +30,7 @@ import {
   sortConcepts, sortQuestions, projectStats,
 } from './graph.mjs';
 import {
-  renderLanding, renderConceptPage, renderQuestionPage, renderBrowsePage, resolveIncludes,
+  renderLanding, renderConceptPage, renderQuestionPage, renderBrowsePage, resolveIncludes, SITE,
 } from './render.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -168,8 +168,17 @@ function mediaBelongsTo(concept, uid) {
   for (const block of concept.body ?? []) {
     if (block?.type === 'image') urls.push(block.media);
   }
-  if (concept.cover && typeof concept.cover === 'object') {
-    urls.push(concept.cover.media, concept.cover.thumbnail);
+  /* A YouTube cover is a link to someone else's host, so it cannot be checked
+     against this user's uploads. It is let through only in the one shape the
+     board produces — a parseable video URL, and the still that YouTube serves
+     for that same id — so it can never smuggle in an arbitrary URL. */
+  const cover = concept.cover;
+  if (cover && typeof cover === 'object' && cover.type === 'youtube') {
+    const id = youtubeId(cover.media);
+    if (!id) return false;
+    if (cover.thumbnail && cover.thumbnail !== youtubePoster(id)) return false;
+  } else if (cover && typeof cover === 'object') {
+    urls.push(cover.media, cover.thumbnail);
   }
   return urls.filter(Boolean).every(url =>
     url.startsWith('https://firebasestorage.googleapis.com/') && url.includes(prefix));
@@ -348,6 +357,14 @@ export const ssr = onRequest(
         }));
       }
 
+      /* robots.txt has always advertised this; until now it 404'd. Built from
+         the live board rather than at deploy time, so a concept approved this
+         morning is listed this morning. */
+      if (path === '/sitemap.xml') {
+        response.set('Content-Type', 'application/xml; charset=utf-8');
+        return response.status(200).send(sitemapXml(board));
+      }
+
       if (path === '/concepts.json') {
         return response.status(200).json({
           stats: board.stats,
@@ -370,6 +387,42 @@ export const ssr = onRequest(
     }
   },
 );
+
+/* Priorities are relative within the site, not a ranking claim: the board and
+   its two entry points first, then concepts, then the pages that rarely move. */
+const SITEMAP_STATIC = [
+  ['/', '1.0', 'daily'],
+  ['/concepts/', '0.9', 'daily'],
+  ['/about/', '0.5', 'monthly'],
+  ['/contribute/', '0.5', 'monthly'],
+];
+
+function sitemapXml(board) {
+  const url = (loc, priority, changefreq, lastmod) => [
+    '  <url>',
+    `    <loc>${SITE}${loc}</loc>`,
+    lastmod ? `    <lastmod>${lastmod}</lastmod>` : '',
+    `    <changefreq>${changefreq}</changefreq>`,
+    `    <priority>${priority}</priority>`,
+    '  </url>',
+  ].filter(Boolean).join('\n');
+
+  /* Dates on the board are already plain YYYY-MM-DD, which is a legal lastmod.
+     Anything else is left off rather than guessed at. */
+  const day = value => (/^\d{4}-\d{2}-\d{2}/.test(String(value ?? '')) ? String(value).slice(0, 10) : '');
+
+  const entries = [
+    ...SITEMAP_STATIC.map(([loc, priority, freq]) => url(loc, priority, freq)),
+    ...board.concepts.map(c => url(c.url, '0.8', 'weekly', day(c.date))),
+    ...board.questions.map(q => url(q.url, '0.6', 'weekly')),
+  ];
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${entries.join('\n')}
+</urlset>
+`;
+}
 
 const publicShape = c => ({
   slug: c.slug, title: c.title, creator: c.creator, type: c.type,

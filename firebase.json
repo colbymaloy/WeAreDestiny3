@@ -112,9 +112,26 @@
           "functionId": "ssr",
           "region": "us-central1"
         }
+      },
+      {
+        "source": "/sitemap.xml",
+        "function": {
+          "functionId": "ssr",
+          "region": "us-central1"
+        }
       }
     ],
     "headers": [
+      {
+        "comment": "Pages revalidate on every visit. Without this they were held for an hour, so a deploy could not reach anyone already carrying the old HTML — and the ?v= stamps on assets were useless, because the page naming the new stamp was itself stale. Assets below opt back into a long cache.",
+        "source": "**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
       {
         "source": "/assets/**",
         "headers": [

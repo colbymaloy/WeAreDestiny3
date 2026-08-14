@@ -8,12 +8,12 @@
 
 import {
   TYPES, CATEGORIES, CATEGORY_LABEL, STATUSES, RELATIONS, MAX, TEXT_FIRST,
-  slugify, handleProblem, foldHandle, articleText,
+  slugify, handleProblem, foldHandle, articleText, youtubeId, youtubePoster,
 } from '/assets/model.mjs';
 import { renderOverview } from '/assets/render.mjs';
 import { iconSprite } from '/assets/icons.mjs';
-import { createEditor } from '/assets/editor.js?v=10';
-import { createConceptPicker } from '/assets/picker.js?v=10';
+import { createEditor } from '/assets/editor.js?v=13';
+import { createConceptPicker } from '/assets/picker.js?v=13';
 import { firebaseConfig, isConfigured } from '/assets/firebase-config.js';
 
 const el = id => document.getElementById(id);
@@ -41,6 +41,7 @@ const state = {
   questions: [],
   categories: [],
   cover: null,
+  youtube: null,
   seq: 0,
 };
 
@@ -253,15 +254,94 @@ const editor = editorHost ? createEditor(editorHost, {
   onChange: () => touched(),
 }) : null;
 
+/* --- posters --------------------------------------------------------------- */
+
+/* A video still needs a poster so the board has something to show before the
+   file loads. Rather than asking for one, take it off the front of the video:
+   decoded in the page from a local object URL, so the canvas is never tainted
+   and nothing is uploaded that the reader did not already choose. */
+function firstFrame(file, maxWidth = 1280) {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement('video');
+    const url = URL.createObjectURL(file);
+    let settled = false;
+
+    const finish = act => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      URL.revokeObjectURL(url);
+      act();
+    };
+    const fail = why => finish(() => reject(new Error(why)));
+    /* A codec the browser cannot decode may simply never fire an event. */
+    const timer = setTimeout(() => fail('timeout'), 15000);
+
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = 'auto';
+    video.addEventListener('error', () => fail('decode'));
+
+    video.addEventListener('loadeddata', () => {
+      /* A hair past zero: plenty of encodes open on a black frame. */
+      video.currentTime = Math.min(0.1, (video.duration || 1) / 2);
+    }, { once: true });
+
+    video.addEventListener('seeked', () => {
+      const scale = Math.min(1, maxWidth / (video.videoWidth || maxWidth));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(video.videoWidth * scale);
+      canvas.height = Math.round(video.videoHeight * scale);
+      if (!canvas.width || !canvas.height) return fail('empty');
+
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(blob => {
+        if (!blob) return fail('encode');
+        const name = `${file.name.replace(/\.[^.]+$/, '')}-poster.jpg`;
+        finish(() => resolve(new File([blob], name, { type: 'image/jpeg' })));
+      }, 'image/jpeg', 0.82);
+    }, { once: true });
+
+    video.src = url;
+  });
+}
+
+/* Kicks the grab off as soon as a video is chosen and reports it in place, so
+   the wait happens while the rest of the form is still being filled in. */
+function watchForPoster(input, note) {
+  const file = input.files?.[0];
+  if (!file?.type.startsWith('video/')) {
+    input._poster = null;
+    show(note, false);
+    return;
+  }
+  show(note, true);
+  note.textContent = 'Taking a poster frame from the video…';
+  input._poster = firstFrame(file).then(poster => {
+    note.textContent = 'Poster taken from the first frame.';
+    return poster;
+  }, error => {
+    note.textContent = 'Could not read a frame from this video. An MP4 (H.264) will work.';
+    throw error;
+  });
+}
+
 /* --- cover ----------------------------------------------------------------- */
+
+/* Two ways in, one cover: an upload the project stores and serves, or a YouTube
+   link it only points at. Whichever is filled in hides the other, so there is
+   never a question of which one wins. */
 
 const coverInput = el('f-cover');
 const drop = el('cover-drop');
+const youtubeInput = el('f-youtube');
 
 function paintCover() {
   const set = Boolean(state.cover);
+  const linked = Boolean(state.youtube);
   show(el('cover-set'), set);
-  show(drop, !set);
+  show(drop, !set && !linked);
+  show(el('cover-yt'), !set);
   if (!set) return;
   el('cover-name').textContent = state.cover.file.name;
   el('cover-shot').style.backgroundImage = state.cover.preview ? `url(${state.cover.preview})` : '';
@@ -271,14 +351,34 @@ function paintCover() {
 function takeCover(file) {
   if (!file) return;
   if (state.cover?.preview) URL.revokeObjectURL(state.cover.preview);
+  const isVideo = file.type.startsWith('video/');
+
   state.cover = {
     file,
-    /* Video posters would need a frame grab; a label is honest enough here. */
-    preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : '',
+    preview: isVideo ? '' : URL.createObjectURL(file),
+    /* A video cover carries its own still, grabbed off the front of it. */
+    poster: isVideo ? firstFrame(file) : null,
   };
+
+  /* The same frame doubles as the thumbnail shown in the panel, so the video
+     is not represented by an empty box while the form is filled in. */
+  state.cover.poster?.then(poster => {
+    if (state.cover?.file !== file) return;
+    state.cover.preview = URL.createObjectURL(poster);
+    paintCover();
+  }, () => { /* named at submit, where it can be acted on */ });
+
   paintCover();
   touched();
 }
+
+/* Kept as typed, so an unreadable link reaches `check` and gets named there
+   rather than vanishing as the reader types it. */
+youtubeInput?.addEventListener('input', () => {
+  state.youtube = youtubeInput.value.trim() || null;
+  paintCover();
+  touched();
+});
 
 drop?.addEventListener('click', () => coverInput.click());
 drop?.addEventListener('keydown', event => {
@@ -304,6 +404,8 @@ el('cover-clear')?.addEventListener('click', () => {
   paintCover();
   touched();
 });
+
+paintCover();
 
 /* --- the board, for citations and questions -------------------------------- */
 
@@ -395,11 +497,7 @@ function addExploration() {
         <label class="fld-label">Media</label>
         <input type="file" data-media accept="image/*,video/mp4,video/quicktime,video/webm">
       </div>
-      <div class="fld" data-poster-field hidden>
-        <label class="fld-label">Poster frame</label>
-        <p class="fld-hint">A still from the video, for the board.</p>
-        <input type="file" data-thumb accept="image/*">
-      </div>
+      <p class="fld-hint" data-poster-note hidden></p>
       <div class="fld-pair">
         <div class="fld">
           <label class="fld-label">Keep <span class="opt">one per line</span></label>
@@ -417,7 +515,7 @@ function addExploration() {
 
     const media = node.querySelector('[data-media]');
     media.addEventListener('change', () => {
-      show(node.querySelector('[data-poster-field]'), Boolean(media.files[0]?.type.startsWith('video/')));
+      watchForPoster(media, node.querySelector('[data-poster-note]'));
       touched();
     });
   });
@@ -444,7 +542,7 @@ function paintChecklist() {
     summary: el('f-summary').value.trim().length >= 40,
     article: articleText(editor?.html).length >= 120,
     references: refs.children.length > 0,
-    media: Boolean(state.cover) || el('explorations').children.length > 0,
+    media: Boolean(state.cover || state.youtube) || el('explorations').children.length > 0,
   };
   for (const item of el('checklist').children) {
     item.classList.toggle('is-done', Boolean(done[item.dataset.check]));
@@ -559,8 +657,8 @@ function collect() {
     summary: el('f-summary').value.trim(),
     article: editor ? editor.html : '',
     explorations: [...el('explorations').children].map((node, index) => {
-      const media = node.querySelector('[data-media]').files[0];
-      const thumb = node.querySelector('[data-thumb]')?.files[0];
+      const input = node.querySelector('[data-media]');
+      const media = input.files[0];
       return {
         id: `exploration-${String(index + 1).padStart(2, '0')}`,
         focus: node.querySelector('[data-focus]').value.trim(),
@@ -569,7 +667,9 @@ function collect() {
         drop: lines(node.querySelector('[data-drop]').value),
         tools: commas(node.querySelector('[data-tools]').value),
         _media: media,
-        _thumb: thumb,
+        /* Still in flight if the video was only just chosen; settled before
+           the form is checked. */
+        _poster: input._poster ?? null,
       };
     }),
     connections: [...refs.children].map(node => {
@@ -618,12 +718,18 @@ function check(concept) {
     found.push('The concept is longer than the form accepts — trim it down.');
   }
 
+  if (state.youtube && !youtubeId(state.youtube)) {
+    found.push('That does not look like a YouTube video link.');
+  }
+
   concept.explorations.forEach((exploration, index) => {
     const where = `Exploration ${String(index + 1).padStart(2, '0')}`;
     if (!exploration.focus) found.push(`${where}: say what it was testing.`);
     if (!exploration._media) found.push(`${where}: attach the image or video.`);
+    /* The poster is taken from the video itself, so this only fires when the
+       browser could not decode it at all. */
     if (exploration.type === 'video' && !exploration._thumb) {
-      found.push(`${where}: a video needs a poster frame.`);
+      found.push(`${where}: no frame could be read from that video. An MP4 (H.264) will work.`);
     }
   });
 
@@ -646,6 +752,25 @@ el('form')?.addEventListener('submit', async event => {
   const button = el('submit');
   const concept = collect();
 
+  /* Settle the frame grabs before checking, so a video chosen a second ago is
+     judged on whether a poster could be read rather than on the timing. */
+  const posters = [
+    ...concept.explorations.map(e => e._poster),
+    state.cover?.poster ?? null,
+  ];
+  if (posters.some(Boolean)) {
+    button.disabled = true;
+    button.textContent = 'Reading poster frames…';
+    await Promise.allSettled(posters.filter(Boolean));
+    button.disabled = false;
+    button.textContent = 'Submit for review';
+  }
+
+  for (const exploration of concept.explorations) {
+    exploration._thumb = exploration._poster ? await exploration._poster.catch(() => null) : null;
+    delete exploration._poster;
+  }
+
   const found = check(concept);
   if (found.length) return problems(found);
   problems([]);
@@ -656,21 +781,30 @@ el('form')?.addEventListener('submit', async event => {
   try {
     setLabel('Uploading media…');
 
-    if (state.cover) {
+    /* A linked video is already hosted, so there is nothing to upload and
+       YouTube's own still doubles as the board thumbnail. */
+    if (state.youtube) {
+      concept.cover = {
+        type: 'youtube',
+        media: state.youtube,
+        thumbnail: youtubePoster(youtubeId(state.youtube)),
+      };
+    } else if (state.cover) {
       const uploaded = await state.upload(state.cover.file, state.user.uid);
       concept.cover = {
         type: state.cover.file.type.startsWith('video/') ? 'video' : 'image',
         media: uploaded.url,
       };
-      /* A video cover needs a still, and the first exploration poster is the
-         only one we can be sure exists. */
+      /* Its own first frame, the same as an exploration's. This used to borrow
+         a poster from whichever exploration happened to have one. */
       if (concept.cover.type === 'video') {
-        const poster = concept.explorations.find(e => e._thumb);
+        const poster = state.cover.poster ? await state.cover.poster.catch(() => null) : null;
         if (!poster) {
           setLabel('Submit for review');
           button.disabled = false;
-          return problems(['A video cover needs a poster frame — add one as an exploration, or use an image.']);
+          return problems(['No frame could be read from the cover video. An MP4 (H.264) will work, or use an image.']);
         }
+        concept.cover.thumbnail = (await state.upload(poster, state.user.uid)).url;
       }
     }
 
@@ -681,10 +815,6 @@ el('form')?.addEventListener('submit', async event => {
       }
       delete exploration._media;
       delete exploration._thumb;
-    }
-
-    if (concept.cover?.type === 'video') {
-      concept.cover.thumbnail = concept.explorations.find(e => e.thumbnail)?.thumbnail;
     }
 
     setLabel('Submitting…');

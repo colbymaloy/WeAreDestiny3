@@ -1,0 +1,412 @@
+/* =============================================================
+   About
+
+   Built from the design mockup: a full-bleed hero, then alternating
+   bands of copy and artwork over the same dark ground the board
+   uses. Loaded after home.css, whose tokens (--l-blue, --l-muted,
+   --l-edge, --l-ease) this file reuses rather than restating.
+   ============================================================= */
+
+.about {
+  --ab-max: 1600px;
+  --ab-deep: #070B16;
+}
+
+.ab-wrap {
+  width: 100%;
+  max-width: var(--ab-max);
+  margin: 0 auto;
+  padding: 0 var(--l-gutter);
+}
+.ab-narrow { max-width: 900px; }
+
+.ab-sec {
+  position: relative;
+  isolation: isolate;
+  padding: clamp(64px, 8vw, 104px) 0;
+  border-top: 1px solid rgba(255, 255, 255, .05);
+}
+
+/* --- shared bits ----------------------------------------------------------- */
+
+/* A rule, then a tracked label. Marks the start of every band. */
+.about .ab-kicker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 24px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--l-muted);
+}
+.ab-rule { width: 24px; height: 1px; background: var(--l-blue); }
+
+.about h2 {
+  margin: 0 0 24px;
+  font-size: clamp(28px, 3.4vw, 46px);
+  font-weight: 700;
+  letter-spacing: -.02em;
+  line-height: 1.1;
+  color: #FFFFFF;
+}
+.about .ab-lede {
+  margin: 0 0 18px;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--l-muted);
+}
+.about .ab-lede:last-child { margin-bottom: 0; }
+
+.ab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 22px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background .18s var(--l-ease), border-color .18s var(--l-ease);
+}
+.ab-btn svg { width: 16px; height: 16px; transition: transform .18s var(--l-ease); }
+.ab-btn:hover svg { transform: translateX(3px); }
+.ab-btn-primary { background: var(--l-blue); color: #FFFFFF; }
+.ab-btn-primary:hover { background: #1D4ED8; color: #FFFFFF; }
+.ab-btn-ghost { border-color: rgba(255,255,255,.2); color: #FFFFFF; }
+.ab-btn-ghost:hover { border-color: rgba(255,255,255,.4); background: rgba(255,255,255,.05); color: #FFFFFF; }
+
+/* Frosted surface, used for the framed art and the ecosystem cards. */
+.ab-glass {
+  background: rgba(10, 15, 29, .6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, .08);
+}
+
+/* --- hero ------------------------------------------------------------------ */
+
+.ab-hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  min-height: min(78vh, 660px);
+  padding: clamp(56px, 7vw, 88px) 0;
+}
+/* The art sits to the right and dissolves at both ends, so the copy has a
+   solid ground on the left without a hard seam down the middle. */
+.ab-hero-art {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  -webkit-mask-image: linear-gradient(180deg, #000 58%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 58%, transparent 100%);
+}
+.ab-hero-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 70% 50%;
+  opacity: .6;
+}
+.ab-hero-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, var(--l-bg) 0%, rgba(8,10,15,.8) 45%, rgba(8,10,15,0) 100%),
+    linear-gradient(0deg, var(--l-bg) 0%, rgba(8,10,15,0) 55%);
+}
+.ab-hero-inner { position: relative; }
+.ab-hero-copy { max-width: 620px; }
+.ab-hero-copy h1 {
+  margin: 0 0 24px;
+  font-size: clamp(38px, 5.4vw, 68px);
+  font-weight: 700;
+  letter-spacing: -.03em;
+  line-height: 1.08;
+  color: #FFFFFF;
+}
+.ab-hero-copy p {
+  max-width: 30em;
+  margin: 0 0 38px;
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--l-muted);
+}
+.ab-actions { display: flex; flex-wrap: wrap; gap: 14px; }
+
+/* --- why this exists ------------------------------------------------------- */
+
+.ab-split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(40px, 5vw, 64px);
+  align-items: center;
+}
+@media (min-width: 1024px) { .ab-split { grid-template-columns: 1fr 1fr; } }
+
+/* A wash of blue behind the copy, so the band is not flat black. */
+.ab-glow {
+  position: absolute;
+  top: 0; left: 18%;
+  width: min(800px, 60vw); height: 400px;
+  z-index: -1;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, .07);
+  filter: blur(120px);
+  pointer-events: none;
+}
+
+.ab-frame {
+  position: relative;
+  padding: 8px;
+  border-radius: 14px;
+  background: rgba(10, 15, 29, .6);
+  border: 1px solid rgba(255, 255, 255, .08);
+}
+.ab-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: linear-gradient(to top right, rgba(37,99,235,.12), transparent 60%);
+  pointer-events: none;
+}
+.ab-frame img { display: block; width: 100%; height: auto; border-radius: 9px; }
+
+/* --- principles ------------------------------------------------------------ */
+
+.ab-cols {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(32px, 4vw, 48px);
+}
+@media (min-width: 820px) { .ab-cols { grid-template-columns: repeat(3, 1fr); } }
+
+.ab-mark {
+  display: grid;
+  place-items: center;
+  width: 56px; height: 56px;
+  margin-bottom: 22px;
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 50%;
+  background: rgba(10, 15, 29, .6);
+  color: #FFFFFF;
+  transition: background .18s var(--l-ease);
+}
+.ab-mark svg { width: 24px; height: 24px; }
+.ab-cols > div:hover .ab-mark { background: rgba(37, 99, 235, .2); }
+
+.ab-cols h3 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+.ab-cols p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--l-muted); }
+
+/* --- how it works and the ecosystem ---------------------------------------- */
+
+.ab-deep { background: var(--ab-deep); }
+/* A single lit line down the band, from the design. */
+.ab-ray {
+  position: absolute;
+  top: 0; right: 26%;
+  width: 1px; height: 100%;
+  z-index: -1;
+  background: linear-gradient(180deg, transparent, rgba(37,99,235,.2), transparent);
+  pointer-events: none;
+}
+
+.ab-wide {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(56px, 6vw, 80px);
+}
+@media (min-width: 1280px) { .ab-wide { grid-template-columns: 1fr 1fr; } }
+
+.ab-steps {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px 24px;
+  margin: 0 0 clamp(40px, 5vw, 64px);
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 1024px) { .ab-steps { grid-template-columns: repeat(4, 1fr); } }
+/* The line threads the numbers together, behind them. */
+@media (min-width: 1024px) {
+  .ab-steps::before {
+    content: "";
+    position: absolute;
+    top: 24px; left: 0; right: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, .1);
+  }
+}
+.ab-steps li { position: relative; }
+.ab-step-n {
+  display: grid;
+  place-items: center;
+  width: 48px; height: 48px;
+  margin-bottom: 22px;
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: 50%;
+  background: var(--ab-deep);
+  font-size: 14px;
+  font-weight: 500;
+  color: #FFFFFF;
+}
+.ab-steps h4 { margin: 0 0 8px; font-size: 14px; font-weight: 500; color: #FFFFFF; }
+.ab-steps p { margin: 0; font-size: 12.5px; line-height: 1.7; color: var(--l-muted); }
+
+.ab-band {
+  height: 260px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 14px;
+}
+.ab-band img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .7s var(--l-ease);
+}
+.ab-band:hover img { transform: scale(1.05); }
+
+.ab-eco-h { font-size: clamp(24px, 2.6vw, 32px); margin-bottom: 16px; }
+.about .ab-eco-p {
+  max-width: 46ch;
+  margin: 0 0 44px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--l-muted);
+}
+
+.ab-cards { display: grid; gap: 16px; }
+.ab-card {
+  display: grid;
+  grid-template-columns: 1fr;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 14px;
+  background: rgba(10, 15, 29, .6);
+  transition: border-color .18s var(--l-ease);
+}
+.ab-card:hover { border-color: rgba(255, 255, 255, .2); }
+@media (min-width: 560px) { .ab-card { grid-template-columns: 1fr 1fr; } }
+
+.ab-card-art { overflow: hidden; min-height: 168px; }
+.ab-card-art img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .7s var(--l-ease);
+}
+.ab-card:hover .ab-card-art img { transform: scale(1.05); }
+
+.ab-card-body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px;
+  border-top: 1px solid rgba(255, 255, 255, .1);
+}
+@media (min-width: 560px) {
+  .ab-card-body { border-top: 0; border-left: 1px solid rgba(255, 255, 255, .1); }
+}
+/* The blue tick that marks each card's text side. */
+.ab-card-body::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 24px;
+  width: 2px; height: 16px;
+  border-radius: 0 2px 2px 0;
+  background: var(--l-blue);
+}
+.ab-card-body h3 { margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #FFFFFF; }
+.ab-card-body p { margin: 0 0 16px; font-size: 12.5px; line-height: 1.7; color: var(--l-muted); }
+.ab-card-body a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--l-muted);
+  transition: color .18s var(--l-ease);
+}
+.ab-card-body a svg { width: 14px; height: 14px; transition: transform .18s var(--l-ease); }
+.ab-card:hover .ab-card-body a { color: #FFFFFF; }
+.ab-card-body a:hover svg { transform: translateX(3px); }
+
+/* Alternating sides: art right, text left. */
+@media (min-width: 560px) {
+  .ab-card-flip .ab-card-art { order: 2; }
+  .ab-card-flip .ab-card-body {
+    order: 1;
+    border-left: 0;
+    border-right: 1px solid rgba(255, 255, 255, .1);
+  }
+}
+
+/* --- closing --------------------------------------------------------------- */
+
+.ab-close { overflow: hidden; }
+.ab-close-glow {
+  position: absolute;
+  bottom: -60px; left: 50%;
+  width: min(900px, 90vw); height: 220px;
+  z-index: -1;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: rgba(37, 99, 235, .12);
+  filter: blur(80px);
+  pointer-events: none;
+}
+.ab-close-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.ab-close-inner > div:first-child { max-width: 620px; }
+.ab-close-actions { display: flex; flex-wrap: wrap; gap: 14px; }
+
+/* --- fan project ----------------------------------------------------------- */
+
+.about .ab-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 18px;
+  padding: 9px 16px;
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .04);
+  font-size: 12.5px;
+  color: var(--l-muted);
+}
+.ab-note svg { width: 15px; height: 15px; }
+.about .ab-fine { margin: 0; font-size: 12px; line-height: 1.8; color: #64748B; }
+
+/* --- reveal on scroll ------------------------------------------------------ */
+
+/* Set by script, so the page still reads with JavaScript off. */
+.about .ab-rise.is-armed {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity .8s var(--l-ease), transform .8s var(--l-ease);
+  transition-delay: var(--delay, 0ms);
+}
+.about .ab-rise.is-armed.is-in { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .about .ab-rise.is-armed { opacity: 1; transform: none; transition: none; }
+  .ab-band img, .ab-card-art img, .ab-btn svg, .ab-card-body a svg { transition: none; }
+  .ab-band:hover img, .ab-card:hover .ab-card-art img { transform: none; }
+}

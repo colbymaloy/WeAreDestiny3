@@ -22,7 +22,7 @@ Issues, pull requests, discussions, commits, and anywhere else someone is repres
 
 ## Reporting
 
-Open an issue if it's something the community should see resolved in the open, or contact the maintainer directly at **colbymaloydev@gmail.com** if it isn't. Reports are handled privately.
+Open an issue if it's something the community should see resolved in the open, or contact the maintainer directly at **[@all4ndev](https://x.com/all4ndev)** if it isn't. Reports are handled privately.
 
 Maintainers may edit, hide, or remove content and may block accounts. The response fits the behaviour: usually a warning, sometimes an immediate removal.
 
